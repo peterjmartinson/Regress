@@ -5,7 +5,7 @@ from Regress1D import Regress1D
 
 class TestCanary(unittest.TestCase):
     
-    def test_Tweets(self):
+    def test__Tweets(self):
         assert 1 == 1
 
 class Test_setFeatures(unittest.TestCase):
@@ -156,5 +156,22 @@ class Test__evaluateNewThetas(unittest.TestCase):
         self.model.a = None
         with self.assertRaises(ValueError):
             self.model.evaluateNewThetas()
+
+    def test__Changes_theta_0(self):
+        self.model.setFeatures(self.feature_array)
+        self.model.setTargets(self.target_array)
+        self.model.evaluateDerivativeOfJ()
+        initial_theta = self.model.theta[0]
+        self.model.evaluateNewThetas()
+        assert self.model.theta[0] != initial_theta
+
+    def test__Changes_theta_1(self):
+        self.model.setFeatures(self.feature_array)
+        self.model.setTargets(self.target_array)
+        self.model.evaluateDerivativeOfJ()
+        initial_theta = self.model.theta[1]
+        self.model.evaluateNewThetas()
+        assert self.model.theta[1] != initial_theta
+
 
 

@@ -83,3 +83,6 @@ class Regress1D(object):
             raise ValueError('y contains no data!')
         if self.a is None:
             raise ValueError('y contains no data!')
+        temp_theta_0 = self.theta[0] - self.a * self.dJ[0]
+        temp_theta_1 = self.theta[1] - self.a * self.dJ[1]
+        self.theta = np.array([temp_theta_0, temp_theta_1])
