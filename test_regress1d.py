@@ -114,7 +114,7 @@ class Test_evaluateDerivativeOfJ(unittest.TestCase):
         print("--- Diagnostic ---")
         print("m =     ", self.model.m)
         print("n =     ", self.model.n)
-        print("X =     ", self.model.X)
+        print("X =\n", self.model.X)
         print("y =     ", self.model.y)
         print("theta = ", self.model.theta)
         print("dJ =    ", self.model.dJ)

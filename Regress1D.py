@@ -76,6 +76,7 @@ class Regress1D(object):
             (1/self.m) * np.sum( (np.sum(self.theta*self.X.T, axis=1) - self.y) * self.X[1:])
         ])
 
+    # theta_j := theta_j - alpha - [d/dtheta_j]J(theta_0, theta_1), for j = 0, 1
     def evaluateNewThetas(self):
         if self.dJ is None:
             raise ValueError('X contains no data!')
