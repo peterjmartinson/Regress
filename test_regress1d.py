@@ -157,4 +157,48 @@ class Test__evaluateNewThetas(unittest.TestCase):
         with self.assertRaises(ValueError):
             self.model.evaluateNewThetas()
 
+    def test__Initializes_delta_theta_if_does_not_exist(self):
+        self.model.X = 1
+        self.model.y = 1
+        self.model.theta = np.array([1, 1])
+        self.model.dJ = 1
+        self.model.a = 1
+        self.model.delta_theta = None
+        correct_delta_theta = np.array([0, 0])
+        self.model.evaluateNewThetas()
+        print("theta = ", self.model.theta)
+        print("delta_theta = ", self.model.delta_theta)
+        npt.assert_array_equal(self.model.delta_theta, correct_delta_theta)
+
+    def test__Changes_value_of_theta_0(self):
+        self.model.X = 1
+        self.model.y = 1
+        self.model.theta = np.array([1, 1])
+        self.model.dJ = 1
+        self.model.a = 1
+        self.model.delta_theta = None
+        initial_theta_0 = self.model.theta[0]
+        self.model.evaluateNewThetas()
+        print("initial theta 0 = ", initial_theta_0)
+        print("final theta 0 = ", self.model.theta[0])
+        self.assertTrue(initial_theta_0 != self.model.theta[0])
+
+    def test__Changes_all_theta_values(self):
+        self.model.X = 1
+        self.model.y = 1
+        self.model.theta = np.array([1, 1])
+        self.model.dJ = 1
+        self.model.a = 1
+        self.model.delta_theta = None
+        d = np.zeros(len(self.model.theta)
+        initial_theta = self.model.theta
+        self.model.evaluateNewThetas()
+        for i in range(len(self.model.theta)):
+            if self.model.theta[i] = #############################
+        d = self.model.theta - initial_theta
+        print("initial theta = ", initial_theta)
+        print("final theta = ", self.model.theta)
+        print("d = ", d)
+        self.assertTrue(d.sum() == 0)
+
 

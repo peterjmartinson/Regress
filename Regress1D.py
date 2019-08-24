@@ -9,6 +9,7 @@ class Regress1D(object):
         self.m     = None # Number of training examples
         self.n     = None # Number of features
         self.theta = None # Parameter array
+        self.delta_theta = None # Differences between old Theta and new Theta values
         self.dJ    = None # container for all current dJ/dTheta values
         self.a     = 0.1  # Learning rate
 
@@ -84,3 +85,7 @@ class Regress1D(object):
             raise ValueError('y contains no data!')
         if self.a is None:
             raise ValueError('y contains no data!')
+        if (self.delta_theta == None):
+            self.delta_theta = self.theta*0
+        #self.theta[0] = 2
+
