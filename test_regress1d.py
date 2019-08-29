@@ -105,7 +105,6 @@ class Test_evaluateDerivativeOfJ(unittest.TestCase):
         with self.assertRaises(ValueError):
             self.model.evaluateDerivativeOfJ()
 
-    ## Need to figure out a test value for dJ, and the rest of the inputs
     def test__Sets_dJ(self):
         correct_dJ = [-2.85, -21.45]
         self.model.setFeatures(self.feature_array)
@@ -190,12 +189,10 @@ class Test__evaluateNewThetas(unittest.TestCase):
         self.model.dJ = 1
         self.model.a = 1
         self.model.delta_theta = None
-        d = np.zeros(len(self.model.theta)
+        d = np.zeros(len(self.model.theta))
         initial_theta = self.model.theta
         self.model.evaluateNewThetas()
-        for i in range(len(self.model.theta)):
-            if self.model.theta[i] = #############################
-        d = self.model.theta - initial_theta
+        d = initial_theta - self.model.delta_theta
         print("initial theta = ", initial_theta)
         print("final theta = ", self.model.theta)
         print("d = ", d)

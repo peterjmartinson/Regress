@@ -87,5 +87,9 @@ class Regress1D(object):
             raise ValueError('y contains no data!')
         if (self.delta_theta == None):
             self.delta_theta = self.theta*0
-        #self.theta[0] = 2
+        temp_theta = np.zeros(len(self.theta))
+        self.evaluateDerivativeOfJ()
+        for j in range(len(self.theta)):
+            temp_theta[j] = self.theta[j] - self.a - self.dJ
+        ## self.theta[0] = 2
 
