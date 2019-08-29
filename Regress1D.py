@@ -1,7 +1,9 @@
 import pandas as pd
 import numpy as np
 
-class Regress1D(object):
+# class Regress1D(object):
+class Regress1D:
+    """Provides a linear regression model"""
     
     def __init__(self):
         self.X     = None # Feature array
@@ -89,7 +91,7 @@ class Regress1D(object):
         self.evaluateDerivativeOfJ()
         if self.dJ is None:
             raise ValueError('dJ contains no data!')
-        temp_theta = np.zeros(len(self.theta))
+        # temp_theta = np.zeros(len(self.theta))
         temp_theta = self.theta - self.a - self.dJ
         self.theta = temp_theta
         # for j in range(len(self.theta)):
