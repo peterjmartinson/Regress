@@ -105,6 +105,21 @@ class Test_evaluateDerivativeOfJ(unittest.TestCase):
         with self.assertRaises(ValueError):
             self.model.evaluateDerivativeOfJ()
 
+    def test__Throws_if_m_is_None(self):
+        self.model.setFeatures(self.feature_array)
+        self.model.setTargets(self.target_array)
+        self.model.m = None
+        with self.assertRaises(ValueError):
+            self.model.evaluateDerivativeOfJ()
+
+    def test__Throws_if_m_is_zero(self):
+        self.model.setFeatures(self.feature_array)
+        self.model.setTargets(self.target_array)
+        self.model.m = 0
+        with self.assertRaises(ValueError):
+            self.model.evaluateDerivativeOfJ()
+
+
     def test__Sets_dJ(self):
         correct_dJ = [-2.85, -21.45]
         self.model.setFeatures(self.feature_array)
@@ -124,6 +139,7 @@ class Test__evaluateNewThetas(unittest.TestCase):
     def setUp(self):
         self.model = Regress1D()
         self.feature_array = np.array([1,2,3,4,5,6,7,8,9,10])
+        self.m = len(self.feature_array)
         self.target_array = self.feature_array * 1.7
 
     def test__Exists(self):

@@ -5,7 +5,7 @@ class Regress1D(object):
     
     def __init__(self):
         self.X     = None # Feature array
-        self.y     = None # Response array
+        self.y     = None # Target array
         self.m     = None # Number of training examples
         self.n     = None # Number of features
         self.theta = None # Parameter array
@@ -72,6 +72,10 @@ class Regress1D(object):
             raise ValueError('X contains no data!')
         if self.y is None:
             raise ValueError('y contains no data!')
+        if self.m is None:
+            raise ValueError('m contains no data!')
+        if self.m == 0:
+            raise ValueError('m is zero!  Division by Zero!')
         self.dJ = np.array([
             (1/self.m) * np.sum( (np.sum(self.theta*self.X.T, axis=1) - self.y) ),
             (1/self.m) * np.sum( (np.sum(self.theta*self.X.T, axis=1) - self.y) * self.X[1:])
