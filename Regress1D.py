@@ -9,7 +9,6 @@ class Regress1D(object):
         self.m     = None # Number of training examples
         self.n     = None # Number of features
         self.theta = None # Parameter array
-        self.delta_theta = None # Differences between old Theta and new Theta values
         self.dJ    = None # container for all current dJ/dTheta values
         self.a     = 0.1  # Learning rate
 
@@ -83,17 +82,17 @@ class Regress1D(object):
 
     # theta_j := theta_j - alpha - [d/dtheta_j]J(theta_0, theta_1), for j = 0, 1
     def evaluateNewThetas(self):
-        if self.dJ is None:
-            raise ValueError('X contains no data!')
         if self.theta is None:
-            raise ValueError('y contains no data!')
+            raise ValueError('theta contains no data!')
         if self.a is None:
-            raise ValueError('y contains no data!')
-        if (self.delta_theta == None):
-            self.delta_theta = self.theta*0
-        temp_theta = np.zeros(len(self.theta))
+            raise ValueError('a contains no data!')
         self.evaluateDerivativeOfJ()
-        for j in range(len(self.theta)):
-            temp_theta[j] = self.theta[j] - self.a - self.dJ
+        if self.dJ is None:
+            raise ValueError('dJ contains no data!')
+        temp_theta = np.zeros(len(self.theta))
+        temp_theta = self.theta - self.a - self.dJ
+        self.theta = temp_theta
+        # for j in range(len(self.theta)):
+        #     temp_theta[j] = self.theta[j] - self.a - self.dJ
         ## self.theta[0] = 2
 

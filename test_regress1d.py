@@ -3,6 +3,16 @@ import numpy as np
 import numpy.testing as npt
 from Regress1D import Regress1D
 
+def printDiagnostics(self):
+    print("--- Diagnostic ---")
+    print("X (Feature array):               ", self.X)
+    print("y (Target array):                ", self.y)
+    print("m (Number of training examples): ", self.m)
+    print("n (Number of features):          ", self.n)
+    print("theta (Parameter array):         ", self.theta)
+    print("dJ (container for all current dJ/dTheta values): ", self.dJ)
+    print("a (Learning rate):               ", self.a)
+
 class TestCanary(unittest.TestCase):
     
     def test_Tweets(self):
@@ -125,13 +135,6 @@ class Test_evaluateDerivativeOfJ(unittest.TestCase):
         self.model.setFeatures(self.feature_array)
         self.model.setTargets(self.target_array)
         self.model.evaluateDerivativeOfJ()
-        print("--- Diagnostic ---")
-        print("m =     ", self.model.m)
-        print("n =     ", self.model.n)
-        print("X =\n", self.model.X)
-        print("y =     ", self.model.y)
-        print("theta = ", self.model.theta)
-        print("dJ =    ", self.model.dJ)
         npt.assert_array_equal(self.model.dJ, correct_dJ)
 
 class Test__evaluateNewThetas(unittest.TestCase):
@@ -139,59 +142,24 @@ class Test__evaluateNewThetas(unittest.TestCase):
     def setUp(self):
         self.model = Regress1D()
         self.feature_array = np.array([1,2,3,4,5,6,7,8,9,10])
-        self.m = len(self.feature_array)
         self.target_array = self.feature_array * 1.7
+        self.model.setFeatures(self.feature_array)
+        self.model.setTargets(self.target_array)
 
     def test__Exists(self):
         self.assertTrue(hasattr(self.model, 'evaluateNewThetas'))
 
-    def test__Throws_If_dJ_Is_None(self):
-        self.model.X = 1
-        self.model.y = 1
-        self.model.theta = 1
-        self.model.dJ = None
-        self.model.a = 1
-        with self.assertRaises(ValueError):
-            self.model.evaluateNewThetas()
-
     def test__Throws_If_theta_Is_None(self):
-        self.model.X = 1
-        self.model.y = 1
         self.model.theta = None
-        self.model.dJ = 1
-        self.model.a = 1
         with self.assertRaises(ValueError):
             self.model.evaluateNewThetas()
 
     def test__Throws_If_a_Is_None(self):
-        self.model.X = 1
-        self.model.y = 1
-        self.model.theta = 1
-        self.model.dJ = 1
         self.model.a = None
         with self.assertRaises(ValueError):
             self.model.evaluateNewThetas()
 
-    def test__Initializes_delta_theta_if_does_not_exist(self):
-        self.model.X = 1
-        self.model.y = 1
-        self.model.theta = np.array([1, 1])
-        self.model.dJ = 1
-        self.model.a = 1
-        self.model.delta_theta = None
-        correct_delta_theta = np.array([0, 0])
-        self.model.evaluateNewThetas()
-        print("theta = ", self.model.theta)
-        print("delta_theta = ", self.model.delta_theta)
-        npt.assert_array_equal(self.model.delta_theta, correct_delta_theta)
-
     def test__Changes_value_of_theta_0(self):
-        self.model.X = 1
-        self.model.y = 1
-        self.model.theta = np.array([1, 1])
-        self.model.dJ = 1
-        self.model.a = 1
-        self.model.delta_theta = None
         initial_theta_0 = self.model.theta[0]
         self.model.evaluateNewThetas()
         print("initial theta 0 = ", initial_theta_0)
@@ -199,19 +167,13 @@ class Test__evaluateNewThetas(unittest.TestCase):
         self.assertTrue(initial_theta_0 != self.model.theta[0])
 
     def test__Changes_all_theta_values(self):
-        self.model.X = 1
-        self.model.y = 1
-        self.model.theta = np.array([1, 1])
-        self.model.dJ = 1
-        self.model.a = 1
-        self.model.delta_theta = None
         d = np.zeros(len(self.model.theta))
         initial_theta = self.model.theta
         self.model.evaluateNewThetas()
-        d = initial_theta - self.model.delta_theta
+        d = initial_theta - self.model.theta
         print("initial theta = ", initial_theta)
         print("final theta = ", self.model.theta)
         print("d = ", d)
-        self.assertTrue(d.sum() == 0)
+        self.assertTrue(d.sum() != 0)
 
 
