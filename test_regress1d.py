@@ -188,4 +188,16 @@ class Test__evaluateNewThetas:
         print("d = ", d)
         assert d.sum() != 0
 
+class Test__getH:
+
+    def test__Exists(self, model):
+        assert hasattr(model, 'getH')
+
+    def test__Returns_numpy_array(self, model, feature_array, target_array):
+        model.setFeatures(feature_array)
+        model.setTargets(target_array)
+        H = model.getH()
+        print("theta: ", model.theta)
+        print("X:     ", model.X:
+        assert isinstance(H, np.ndarray)
 

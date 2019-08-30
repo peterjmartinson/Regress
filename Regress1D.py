@@ -54,19 +54,12 @@ class Regress1D:
     def getTarget(self):
         return self.y
 
-    # np.sum(np.sum(theta*X.T, axis=1) - y)
-    # where X = [[1,1,1...],[x0_0, x0_1, x0_2, ...],[x1_0, x1_1, x1_2, ...],...]
-    def dJ_over_dTheta1(self):
-        result = 0
-        for i in range(0, self.m):
-            result += self.theta[0] + self.theta[1]*self.X[i] - self.y[i]
-        return result/self.m
+    def getH(self):
+        H = self.theta * self.X
+        return H
 
-    def dJ_over_dTheta2(self):
-        result = 0
-        for i in range(0, self.m):
-            result += (self.theta[0] + self.theta[1]*self.X[i] - self.y[i]) * self.X[i]
-        return result/self.m
+    def getJ(self):
+        return self.J
 
     def evaluateDerivativeOfJ(self):
         if self.X is None:
