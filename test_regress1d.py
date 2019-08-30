@@ -198,16 +198,46 @@ class Test__evaluateNewThetas:
         print("d = ", d)
         assert d.sum() != 0
 
-class Test__getH:
+class Test__getJ:
 
     def test__Exists(self, model):
-        assert hasattr(model, 'getH')
+        assert hasattr(model, 'getJ')
+
+    def test__Returns_a_float(self, model, feature_array, target_array):
+        model.setFeatures(feature_array)
+        model.setTargets(target_array)
+        J = model.getJ()
+        assert isinstance(J, float)
+
+    def test__Returns_correct_J(self, model, feature_array, target_array):
+        model.setFeatures(feature_array)
+        model.setTargets(target_array)
+        correct_J = 6.082499999999999
+        J = model.getJ()
+        assert J == correct_J
+
+
+
+
+
+
+class Test__getHypothesis:
+
+    def test__Exists(self, model):
+        assert hasattr(model, 'getHypothesis')
 
     def test__Returns_numpy_array(self, model, feature_array, target_array):
         model.setFeatures(feature_array)
         model.setTargets(target_array)
-        H = model.getH()
-        print("theta: ", model.theta)
-        print("X:     ", model.X)
+        H = model.getHypothesis()
         assert isinstance(H, np.ndarray)
+
+    def test__Resulting_hypothesis_is_1_by_m(self, model, feature_array, target_array):
+        model.setFeatures(feature_array)
+        model.setTargets(target_array)
+        h = model.getHypothesis()
+        m = model.m
+        assert h.size == m
+
+
 

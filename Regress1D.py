@@ -54,12 +54,22 @@ class Regress1D:
     def getTarget(self):
         return self.y
 
-    def getH(self):
-        H = self.theta * self.X
-        return H
+    # H(xi) = theta_0 + theta_1 * xi
+    def getHypothesis(self):
+        h = np.sum(self.theta * self.X.T, axis=1)
+        return h
 
+    # J(theta_0, theta_1) = 1/2m sum_i=1^m [ (H(xi)-yi)^2 ]
     def getJ(self):
-        return self.J
+        h = self.getHypothesis()
+        y = self.y
+        m = self.m
+        J = 0
+        for i in range(len(y)):
+            J = J + ( (h[i] - y[i])*(h[i] - y[i]) )
+        J = J * 1/(2 * m)
+        print("J = ", J)
+        return J
 
     def getDerivativeOfJ(self):
         if self.X is None:
@@ -71,8 +81,8 @@ class Regress1D:
         if self.m == 0:
             raise ValueError('m is zero!  Division by Zero!')
         dJ = np.array([
-            (1/self.m) * np.sum( (np.sum(self.theta*self.X.T, axis=1) - self.y) ),
-            (1/self.m) * np.sum( (np.sum(self.theta*self.X.T, axis=1) - self.y) * self.X[1:])
+            (1/self.m) * np.sum( (self.getHypothesis() - self.y) ),
+            (1/self.m) * np.sum( (self.getHypothesis() - self.y) * self.X[1:])
         ])
         return dJ
 
