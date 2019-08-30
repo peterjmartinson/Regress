@@ -49,6 +49,8 @@ class Regress1D:
     def setTargets(self, numpy_array):
         if not isinstance(numpy_array, np.ndarray):
             raise TypeError('input must be a Numpy array')
+        if numpy_array.size != self.m:
+            raise ValueError('input has wrong number of training values')
         self.y = numpy_array
 
     def getTarget(self):

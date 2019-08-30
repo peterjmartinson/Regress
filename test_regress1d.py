@@ -102,15 +102,21 @@ class Test_setTargets:
     def test__Exists(self, model):
         assert hasattr(model, 'setTargets')
 
-    def test__TakesNumpyArray(self, model):
+    def test__Takes_Numpy_Array(self, model):
         not_an_array = "not a Numpy ndarray"
         with pytest.raises(TypeError):
             model.setTargets(not_an_array)
 
-    def test__Sets_y(self, model, numpy_array):
-        model.setTargets(numpy_array)
-        npt.assert_array_equal(model.y, numpy_array)
+    def test__Throws_if_y_has_not_m_elements(self, model, feature_array, target_array):
+        bad_target_array = np.array([1, 2, 3])
+        model.setFeatures(feature_array)
+        with pytest.raises(ValueError):
+            model.setTargets(bad_target_array)
 
+    def test__Sets_y(self, model, feature_array, target_array):
+        model.setFeatures(feature_array)
+        model.setTargets(target_array)
+        npt.assert_array_equal(model.y, target_array)
 
 class Test_evaluateDerivativeOfJ:
 
@@ -198,6 +204,6 @@ class Test__getH:
         model.setTargets(target_array)
         H = model.getH()
         print("theta: ", model.theta)
-        print("X:     ", model.X:
+        print("X:     ", model.X)
         assert isinstance(H, np.ndarray)
 
