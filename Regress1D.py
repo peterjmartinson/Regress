@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 
-class Regress1D:
+class Model:
     """Provides a linear regression model"""
     
     def __init__(self):
@@ -96,3 +96,18 @@ class Regress1D:
         temp_theta = self.theta - self.a - self.getDerivativeOfJ()
         self.theta = temp_theta
 
+# class ResidualSumOfSquares:
+#     """This is what Ng calls the 'Cost Function', or J"""
+
+# class TrainingInputs:
+
+# class TrainingTargets:
+
+# class Coefficients:
+#     """This is what Ng calls Theta.  The coefficients of the Hypothesis."""
+
+# class Hypothesis:
+#     """This is the result of running the model"""
+
+# class Model:
+#     """This is the glue"""

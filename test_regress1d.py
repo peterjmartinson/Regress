@@ -16,8 +16,8 @@ def printDiagnostics(self):
 
 @pytest.fixture
 def model():
-    from Regress1D import Regress1D
-    return Regress1D()
+    from Regress1D import Model
+    return Model()
 
 @pytest.fixture
 def numpy_array():
