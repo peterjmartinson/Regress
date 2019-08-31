@@ -96,8 +96,38 @@ class Model:
         temp_theta = self.theta - self.a - self.getDerivativeOfJ()
         self.theta = temp_theta
 
-# class ResidualSumOfSquares:
-#     """This is what Ng calls the 'Cost Function', or J"""
+class ResidualSumOfSquares:
+    """This is what Ng calls the 'Cost Function', or J"""
+
+    def __init__(self):
+        pass
+
+    def getValue(self, hypothesis, targets):
+        h = hypothesis
+        y = y
+        m = len(y)
+        J = 0
+        for i in range(len(y)):
+            J = J + ( (h[i] - y[i])*(h[i] - y[i]) )
+        J = J * 1/(2 * m)
+        print("J = ", J)
+        return J
+
+
+    def getDerivative(self):
+        if self.X is None:
+            raise ValueError('X contains no data!')
+        if self.y is None:
+            raise ValueError('y contains no data!')
+        if self.m is None:
+            raise ValueError('m contains no data!')
+        if self.m == 0:
+            raise ValueError('m is zero!  Division by Zero!')
+        dJ = np.array([
+            (1/self.m) * np.sum( (self.getHypothesis() - self.y) ),
+            (1/self.m) * np.sum( (self.getHypothesis() - self.y) * self.X[1:])
+        ])
+        return dJ
 
 # class TrainingInputs:
 

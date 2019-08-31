@@ -20,6 +20,11 @@ def model():
     return Model()
 
 @pytest.fixture
+def rss():
+    from Regress1D import ResidualSumOfSquares
+    return ResidualSumOfSquares()
+
+@pytest.fixture
 def numpy_array():
     return np.array([1., 2., 3.])
 
@@ -240,4 +245,7 @@ class Test__getHypothesis:
         assert h.size == m
 
 
+class Test__Class_ResidualSumOfSquares:
 
+    def test__Exists(self, rss):
+        assert 1==1
