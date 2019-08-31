@@ -104,7 +104,7 @@ class ResidualSumOfSquares:
 
     def getValue(self, hypothesis, targets):
         h = hypothesis
-        y = y
+        y = targets
         m = len(y)
         J = 0
         for i in range(len(y)):

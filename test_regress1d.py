@@ -45,6 +45,10 @@ def target_array():
 def m():
     return 10
 
+@pytest.fixture
+def hypothesis():
+    return np.array([2., 3., 4., 5., 6., 7., 8., 9., 10., 11.])
+
 ## ======================================================= Tests
 
 class TestCanary:
@@ -248,4 +252,25 @@ class Test__getHypothesis:
 class Test__Class_ResidualSumOfSquares:
 
     def test__Exists(self, rss):
-        assert 1==1
+        assert rss != None
+
+    def test__getValue_exists(self, rss):
+        assert hasattr(rss, 'getValue')
+
+    def test__getValue_returns_a_float(self, rss, model, feature_array, target_array):
+        model.setFeatures(feature_array)
+        model.setTargets(target_array)
+        hypothesis = model.getHypothesis()
+        targets = model.y
+        J = rss.getValue(hypothesis, targets)
+        assert isinstance(J, float)
+
+    def test__getValue_returns_correct_J(self, rss, model, feature_array, target_array, hypothesis):
+        model.setFeatures(feature_array)
+        model.setTargets(target_array)
+        correct_J = 6.082499999999999
+        J = rss.getValue(hypothesis, target_array)
+        assert J == correct_J
+
+
+
