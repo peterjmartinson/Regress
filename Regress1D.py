@@ -129,8 +129,57 @@ class ResidualSumOfSquares:
         ])
         return dJ
 
-# class TrainingInputs:
+class TrainingInputs:
+    """This is the array of training inputs"""
 
+    training_inputs = None
+    number_of_features = 0
+    number_of_training_examples = None
+
+    # def setFeatures(self, numpy_array):
+    #     if not isinstance(numpy_array, np.ndarray):
+    #         raise TypeError('input must be a Numpy array')
+    #     if self.X is None:
+    #         self.setNumberOfTrainingExamples(numpy_array)
+    #         self.X = np.vstack((np.ones((1, self.m)), numpy_array))
+    #     else:
+    #         if len(numpy_array) == self.m:
+    #             self.X = np.vstack((self.X, numpy_array))
+    #         else:
+    #             raise TypeError('input array is not the right size')
+    #     self.incrementNumberOfFeatures()
+    #     self.addAnotherTheta()
+    # Should retain information about number of features (n)
+    # Should retain information about number of training examples (m)
+    # Should allow adding training examples
+    # Should *not* initialize the coefficients.  The Model class does this
+    # should only know about the training inputs
+    # set, get, add
+    # Make "Hypothesis" do the work of prepending the x_0 = 1 term
+
+    def __init__(self, numpy_array):
+        if not isinstance(numpy_array, np.ndarray):
+            raise TypeError('input must be a Numpy array')
+        self.number_of_training_examples = len(numpy_array)
+        self.training_inputs = numpy_array
+        self.number_of_features += 1
+
+    def getTrainingInputs(self):
+        return self.training_inputs
+
+    def getNumberOfTrainingExamples(self):
+        return self.number_of_training_examples
+
+    def getNumberOfFeatures(self):
+        return self.number_of_features
+
+    def addTrainingExample(self, numpy_array):
+        if not isinstance(numpy_array, np.ndarray):
+            raise TypeError('input must be a Numpy array')
+        if len(numpy_array) != self.number_of_features:
+            raise ValueError('input must have ', self.number_of_features, ' elements!')
+
+    
 # class TrainingTargets:
 
 # class Coefficients:

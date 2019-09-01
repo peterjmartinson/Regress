@@ -20,7 +20,7 @@ def model():
     return Model()
 
 @pytest.fixture
-def rss():
+def RSS():
     from Regress1D import ResidualSumOfSquares
     return ResidualSumOfSquares()
 
@@ -31,6 +31,11 @@ def numpy_array():
 @pytest.fixture
 def feature_array():
     return np.array([1,2,3,4,5,6,7,8,9,10])
+
+@pytest.fixture
+def Inputs():
+    from Regress1D import TrainingInputs
+    return TrainingInputs(np.array([1,2,3,4,5,6,7,8,9,10]))
 
 @pytest.fixture
 def sample_X():
@@ -251,26 +256,130 @@ class Test__getHypothesis:
 
 class Test__Class_ResidualSumOfSquares:
 
-    def test__Exists(self, rss):
-        assert rss != None
+    def test__Exists(self, RSS):
+        assert RSS != None
 
-    def test__getValue_exists(self, rss):
-        assert hasattr(rss, 'getValue')
+    def test__getValue_exists(self, RSS):
+        assert hasattr(RSS, 'getValue')
 
-    def test__getValue_returns_a_float(self, rss, model, feature_array, target_array):
-        model.setFeatures(feature_array)
-        model.setTargets(target_array)
-        hypothesis = model.getHypothesis()
-        targets = model.y
-        J = rss.getValue(hypothesis, targets)
+    def test__getValue_returns_a_float(self, RSS, model, feature_array, target_array, hypothesis):
+        J = RSS.getValue(hypothesis, target_array)
         assert isinstance(J, float)
 
-    def test__getValue_returns_correct_J(self, rss, model, feature_array, target_array, hypothesis):
-        model.setFeatures(feature_array)
-        model.setTargets(target_array)
+    def test__getValue_returns_correct_J(self, RSS, model, feature_array, target_array, hypothesis):
         correct_J = 6.082499999999999
-        J = rss.getValue(hypothesis, target_array)
+        J = RSS.getValue(hypothesis, target_array)
         assert J == correct_J
 
 
+class Test__Class_TrainingInputs:
 
+    # def test__Exists(self, Inputs):
+    #     assert Inputs != None
+
+    # def test__setInputs_exists(self, Inputs):
+    #     assert hasattr(Inputs, 'setInputs')
+
+    # def test__Exists(self, model):
+    #     assert hasattr(model, 'setFeatures')
+
+    def test__Initializing_takes_numpy_array(self):
+        from Regress1D import TrainingInputs
+        not_an_array = "not a Numpy ndarray"
+        with pytest.raises(TypeError):
+            Inputs = TrainingInputs(not_an_array)
+
+    def test__Initializing_sets_training_inputs(self, feature_array):
+        x_0 = np.ones(10)
+        correct_training_set = feature_array
+        from Regress1D import TrainingInputs
+        Inputs = TrainingInputs(feature_array)
+        npt.assert_array_equal(Inputs.training_inputs, correct_training_set)
+
+    def test__Initializing_sets_number_of_features(self, feature_array):
+        correct_n = 1
+        from Regress1D import TrainingInputs
+        Inputs = TrainingInputs(feature_array)
+        assert Inputs.number_of_features == correct_n
+
+    def test__Initializing_sets_number_of_training_examples(self, feature_array):
+        correct_m = 10
+        from Regress1D import TrainingInputs
+        Inputs = TrainingInputs(feature_array)
+        assert Inputs.number_of_training_examples == correct_m
+
+
+    def test__getTrainingInputs_gets_the_right_inputs(self, Inputs, feature_array):
+        gotten_inputs = Inputs.getTrainingInputs()
+        npt.assert_array_equal(gotten_inputs, feature_array)
+
+    def test__getNumberOfTrainingExamples_gets_the_right_number(self, Inputs, m):
+        gotten_number = Inputs.getNumberOfTrainingExamples()
+        assert gotten_number == m
+
+    def test__getNumberOfFeatures_gets_the_right_number(self, Inputs):
+        correct_n = 1
+        gotten_number = Inputs.getNumberOfFeatures()
+        assert gotten_number == correct_n
+
+    def test__addTrainingExample_takes_a_numpy_array(self, Inputs):
+        not_an_array = "not a Numpy arry"
+        with pytest.raises(TypeError):
+            new_inputs = Inputs.addTrainingExample(not_an_array)
+
+    def test__addTrainingExample_throws_if_array_is_wrong_size(self, Inputs):
+        wrong_array = np.array([1,2,3])
+        with pytest.raises(ValueError):
+            new_inputs = Inputs.addTrainingExample(wrong_array)
+
+## Your feature_array is the wrong shape
+## instead of (1,10), it should be (10,1)!!
+
+
+
+
+
+
+
+
+
+
+
+
+    # def test__Set_m_if_X_is_Empty(self, model, feature_array, m):
+    #     model.setFeatures(feature_array)
+    #     assert m == model.m
+
+    # def test__Throw_Exception_if_Array_is_Wrong_Size(self, model, feature_array):
+    #     model.X = np.array([1.,1.,1.,1.])
+    #     model.m = 4
+    #     with pytest.raises(TypeError):
+    #         model.setFeatures(feature_array)
+
+    # def test__Append_Array_if_X_is_Set(self, model, feature_array, sample_X):
+    #     model.X = sample_X
+    #     model.m = 10
+    #     correct_X = np.vstack((sample_X, feature_array))
+    #     model.setFeatures(feature_array)
+    #     npt.assert_array_equal(model.X, correct_X)
+
+    # def test__Set_n_equal_to_1_if_X_is_Empty(self, model, feature_array):
+    #     model.setFeatures(feature_array)
+    #     assert model.n == 1
+
+    # def test__Increment_n_if_X_is_Set(self, model, feature_array):
+    #     model.setFeatures(feature_array)
+    #     model.setFeatures(feature_array)
+    #     assert model.n == 2
+
+    # def test__Set_theta_if_theta_is_not_yet_set(self, model, feature_array):
+    #     correct_theta = np.array([1, 1])
+    #     model.setFeatures(feature_array)
+    #     npt.assert_array_equal(model.theta, correct_theta)
+
+    # def test__Add_another_theta_if_theta_is_already_set(self, model, feature_array):
+    #     correct_theta = np.array([1,1,1,1])
+    #     model.setFeatures(feature_array)
+    #     model.setFeatures(feature_array)
+    #     model.setFeatures(feature_array)
+    #     npt.assert_array_equal(model.theta, correct_theta)
