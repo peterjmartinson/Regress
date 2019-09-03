@@ -38,6 +38,11 @@ def Inputs():
     return TrainingInputs(np.array([1,2,3,4,5,6,7,8,9,10]))
 
 @pytest.fixture
+def Coefficients():
+    from Regress1D import Coefficients
+    return Coefficients()
+
+@pytest.fixture
 def sample_X():
     return np.array([[1,1,1,1,1,1,1,1,1,1], [1,2,3,4,5,6,7,8,9,10]])
 
@@ -336,6 +341,14 @@ class Test__Class_TrainingInputs:
 ## instead of (1,10), it should be (10,1)!!
 
 
+class Test_Class_Coefficients:
+
+    def test__Initializing_takes_an_integer(self):
+        from Regress1D import Coefficients
+        not_an_integer = "not an integer"
+        with pytest.raises(TypeError):
+            Coef = Coefficients(not_an_integer)
+    
 
 
 

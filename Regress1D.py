@@ -182,8 +182,11 @@ class TrainingInputs:
     
 # class TrainingTargets:
 
-# class Coefficients:
-#     """This is what Ng calls Theta.  The coefficients of the Hypothesis."""
+class Coefficients:
+    """This is what Ng calls Theta.  The coefficients of the Hypothesis."""
+
+    def __init__(self, number_of_features):
+        pass
 
 # class Hypothesis:
 #     """This is the result of running the model"""
