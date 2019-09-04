@@ -40,7 +40,7 @@ def Inputs():
 @pytest.fixture
 def Coefficients():
     from Regress1D import Coefficients
-    return Coefficients()
+    return Coefficients(2)
 
 @pytest.fixture
 def sample_X():
@@ -349,6 +349,43 @@ class Test_Class_Coefficients:
         with pytest.raises(TypeError):
             Coef = Coefficients(not_an_integer)
     
+    def test__Initializing_sets_appropriate_array(self):
+        from Regress1D import Coefficients
+        n = 2
+        correct_array = np.array([1., 1.])
+        Coefficients = Coefficients(n)
+        npt.assert_array_equal(Coefficients.c, correct_array)
+
+    def test__Has_method_getCoefficients(self, Coefficients):
+        assert hasattr(Coefficients, 'getCoefficients')
+
+    def test__getCoefficients_returns_correct_array(self):
+        from Regress1D import Coefficients
+        n = 2
+        correct_array = np.array([1., 1.])
+        Coefficients = Coefficients(n)
+        c = Coefficients.getCoefficients()
+        npt.assert_array_equal(c, correct_array)
+
+    def test__Has_method_addCoefficient(self, Coefficients):
+        assert hasattr(Coefficients, 'addCoefficient')
+
+    def test__addCoefficient_returns_coefficients_array(self, Coefficients):
+        output = Coefficients.addCoefficient()
+        correct_array = Coefficients.c
+        npt.assert_array_equal(output, correct_array)
+
+    def test_addCoefficient_adds_one_element(self, Coefficients):
+        Coefficients.addCoefficient()
+        c = Coefficients.c
+        correct_array = np.array([1., 1., 1.])
+        npt.assert_array_equal(c, correct_array)
+
+    def test__Has_method_modifyCoefficient(self, Coefficients):
+        assert hasattr(Coefficients, 'modifyCoefficient')
+
+    def test__modifyCoefficient throws if no element index(self, Coefficients):
+        pass
 
 
 
@@ -359,40 +396,5 @@ class Test_Class_Coefficients:
 
 
 
-    # def test__Set_m_if_X_is_Empty(self, model, feature_array, m):
-    #     model.setFeatures(feature_array)
-    #     assert m == model.m
 
-    # def test__Throw_Exception_if_Array_is_Wrong_Size(self, model, feature_array):
-    #     model.X = np.array([1.,1.,1.,1.])
-    #     model.m = 4
-    #     with pytest.raises(TypeError):
-    #         model.setFeatures(feature_array)
 
-    # def test__Append_Array_if_X_is_Set(self, model, feature_array, sample_X):
-    #     model.X = sample_X
-    #     model.m = 10
-    #     correct_X = np.vstack((sample_X, feature_array))
-    #     model.setFeatures(feature_array)
-    #     npt.assert_array_equal(model.X, correct_X)
-
-    # def test__Set_n_equal_to_1_if_X_is_Empty(self, model, feature_array):
-    #     model.setFeatures(feature_array)
-    #     assert model.n == 1
-
-    # def test__Increment_n_if_X_is_Set(self, model, feature_array):
-    #     model.setFeatures(feature_array)
-    #     model.setFeatures(feature_array)
-    #     assert model.n == 2
-
-    # def test__Set_theta_if_theta_is_not_yet_set(self, model, feature_array):
-    #     correct_theta = np.array([1, 1])
-    #     model.setFeatures(feature_array)
-    #     npt.assert_array_equal(model.theta, correct_theta)
-
-    # def test__Add_another_theta_if_theta_is_already_set(self, model, feature_array):
-    #     correct_theta = np.array([1,1,1,1])
-    #     model.setFeatures(feature_array)
-    #     model.setFeatures(feature_array)
-    #     model.setFeatures(feature_array)
-    #     npt.assert_array_equal(model.theta, correct_theta)

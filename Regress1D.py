@@ -185,8 +185,23 @@ class TrainingInputs:
 class Coefficients:
     """This is what Ng calls Theta.  The coefficients of the Hypothesis."""
 
+    c = None
+
     def __init__(self, number_of_features):
+        if not isinstance(number_of_features, int):
+            raise TypeError('input must be an integer')
+        self.c = np.ones(number_of_features)
+
+    def getCoefficients(self):
+        return self.c
+
+    def addCoefficient(self):
+        self.c = np.append(self.c, [1])
+        return self.c
+
+    def modifyCoefficient(self):
         pass
+
 
 # class Hypothesis:
 #     """This is the result of running the model"""
