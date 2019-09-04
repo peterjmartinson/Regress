@@ -199,8 +199,13 @@ class Coefficients:
         self.c = np.append(self.c, [1])
         return self.c
 
-    def modifyCoefficient(self):
-        pass
+    def updateCoefficient(self, index, replacement_element):
+        if index > len(self.c):
+            raise ValueError('index out of range')
+        if not isinstance(replacement_element, float):
+            raise TypeError('Replacement element must by of type *float*')
+        self.c[index] = replacement_element
+        return self.c
 
 
 # class Hypothesis:

@@ -381,11 +381,22 @@ class Test_Class_Coefficients:
         correct_array = np.array([1., 1., 1.])
         npt.assert_array_equal(c, correct_array)
 
-    def test__Has_method_modifyCoefficient(self, Coefficients):
-        assert hasattr(Coefficients, 'modifyCoefficient')
+    def test__Has_method_updateCoefficient(self, Coefficients):
+        assert hasattr(Coefficients, 'updateCoefficient')
 
-    def test__modifyCoefficient throws if no element index(self, Coefficients):
-        pass
+    def test__updateCoefficient_throws_if_index_out_of_range(self, Coefficients):
+        with pytest.raises(ValueError):
+            Coefficients.updateCoefficient(10, 1.)
+
+    def test__updateCoefficient_throws_if_replacement_element_not_a_float(self, Coefficients):
+        with pytest.raises(TypeError):
+            Coefficients.updateCoefficient(1, 1)
+
+    def test__updateCoefficient_returns_new_array(self, Coefficients):
+        replacement_element = 2.
+        correct_output = np.array([1., 2.])
+        output = Coefficients.updateCoefficient(1, replacement_element)
+        npt.assert_array_equal(output, correct_output)
 
 
 
