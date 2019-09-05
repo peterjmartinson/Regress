@@ -16,8 +16,13 @@ def printDiagnostics(self):
 
 @pytest.fixture
 def model():
-    from Regress1D import Regress1D
-    return Regress1D()
+    from Regress1D import Model
+    return Model()
+
+@pytest.fixture
+def RSS():
+    from Regress1D import ResidualSumOfSquares
+    return ResidualSumOfSquares()
 
 @pytest.fixture
 def numpy_array():
@@ -26,6 +31,16 @@ def numpy_array():
 @pytest.fixture
 def feature_array():
     return np.array([1,2,3,4,5,6,7,8,9,10])
+
+@pytest.fixture
+def Inputs():
+    from Regress1D import TrainingInputs
+    return TrainingInputs(np.array([1,2,3,4,5,6,7,8,9,10]))
+
+@pytest.fixture
+def Coefficients():
+    from Regress1D import Coefficients
+    return Coefficients(2)
 
 @pytest.fixture
 def sample_X():
@@ -39,6 +54,10 @@ def target_array():
 @pytest.fixture
 def m():
     return 10
+
+@pytest.fixture
+def hypothesis():
+    return np.array([2., 3., 4., 5., 6., 7., 8., 9., 10., 11.])
 
 ## ======================================================= Tests
 
@@ -238,6 +257,155 @@ class Test__getHypothesis:
         h = model.getHypothesis()
         m = model.m
         assert h.size == m
+
+
+class Test__Class_ResidualSumOfSquares:
+
+    def test__Exists(self, RSS):
+        assert RSS != None
+
+    def test__getValue_exists(self, RSS):
+        assert hasattr(RSS, 'getValue')
+
+    def test__getValue_returns_a_float(self, RSS, model, feature_array, target_array, hypothesis):
+        J = RSS.getValue(hypothesis, target_array)
+        assert isinstance(J, float)
+
+    def test__getValue_returns_correct_J(self, RSS, model, feature_array, target_array, hypothesis):
+        correct_J = 6.082499999999999
+        J = RSS.getValue(hypothesis, target_array)
+        assert J == correct_J
+
+
+class Test__Class_TrainingInputs:
+
+    # def test__Exists(self, Inputs):
+    #     assert Inputs != None
+
+    # def test__setInputs_exists(self, Inputs):
+    #     assert hasattr(Inputs, 'setInputs')
+
+    # def test__Exists(self, model):
+    #     assert hasattr(model, 'setFeatures')
+
+    def test__Initializing_takes_numpy_array(self):
+        from Regress1D import TrainingInputs
+        not_an_array = "not a Numpy ndarray"
+        with pytest.raises(TypeError):
+            Inputs = TrainingInputs(not_an_array)
+
+    def test__Initializing_sets_training_inputs(self, feature_array):
+        x_0 = np.ones(10)
+        correct_training_set = feature_array
+        from Regress1D import TrainingInputs
+        Inputs = TrainingInputs(feature_array)
+        npt.assert_array_equal(Inputs.training_inputs, correct_training_set)
+
+    def test__Initializing_sets_number_of_features(self, feature_array):
+        correct_n = 1
+        from Regress1D import TrainingInputs
+        Inputs = TrainingInputs(feature_array)
+        assert Inputs.number_of_features == correct_n
+
+    def test__Initializing_sets_number_of_training_examples(self, feature_array):
+        correct_m = 10
+        from Regress1D import TrainingInputs
+        Inputs = TrainingInputs(feature_array)
+        assert Inputs.number_of_training_examples == correct_m
+
+
+    def test__getTrainingInputs_gets_the_right_inputs(self, Inputs, feature_array):
+        gotten_inputs = Inputs.getTrainingInputs()
+        npt.assert_array_equal(gotten_inputs, feature_array)
+
+    def test__getNumberOfTrainingExamples_gets_the_right_number(self, Inputs, m):
+        gotten_number = Inputs.getNumberOfTrainingExamples()
+        assert gotten_number == m
+
+    def test__getNumberOfFeatures_gets_the_right_number(self, Inputs):
+        correct_n = 1
+        gotten_number = Inputs.getNumberOfFeatures()
+        assert gotten_number == correct_n
+
+    def test__addTrainingExample_takes_a_numpy_array(self, Inputs):
+        not_an_array = "not a Numpy arry"
+        with pytest.raises(TypeError):
+            new_inputs = Inputs.addTrainingExample(not_an_array)
+
+    def test__addTrainingExample_throws_if_array_is_wrong_size(self, Inputs):
+        wrong_array = np.array([1,2,3])
+        with pytest.raises(ValueError):
+            new_inputs = Inputs.addTrainingExample(wrong_array)
+
+## Your feature_array is the wrong shape
+## instead of (1,10), it should be (10,1)!!
+
+
+class Test_Class_Coefficients:
+
+    def test__Initializing_takes_an_integer(self):
+        from Regress1D import Coefficients
+        not_an_integer = "not an integer"
+        with pytest.raises(TypeError):
+            Coef = Coefficients(not_an_integer)
+    
+    def test__Initializing_sets_appropriate_array(self):
+        from Regress1D import Coefficients
+        n = 2
+        correct_array = np.array([1., 1.])
+        Coefficients = Coefficients(n)
+        npt.assert_array_equal(Coefficients.c, correct_array)
+
+    def test__Has_method_getCoefficients(self, Coefficients):
+        assert hasattr(Coefficients, 'getCoefficients')
+
+    def test__getCoefficients_returns_correct_array(self):
+        from Regress1D import Coefficients
+        n = 2
+        correct_array = np.array([1., 1.])
+        Coefficients = Coefficients(n)
+        c = Coefficients.getCoefficients()
+        npt.assert_array_equal(c, correct_array)
+
+    def test__Has_method_addCoefficient(self, Coefficients):
+        assert hasattr(Coefficients, 'addCoefficient')
+
+    def test__addCoefficient_returns_coefficients_array(self, Coefficients):
+        output = Coefficients.addCoefficient()
+        correct_array = Coefficients.c
+        npt.assert_array_equal(output, correct_array)
+
+    def test_addCoefficient_adds_one_element(self, Coefficients):
+        Coefficients.addCoefficient()
+        c = Coefficients.c
+        correct_array = np.array([1., 1., 1.])
+        npt.assert_array_equal(c, correct_array)
+
+    def test__Has_method_updateCoefficient(self, Coefficients):
+        assert hasattr(Coefficients, 'updateCoefficient')
+
+    def test__updateCoefficient_throws_if_index_out_of_range(self, Coefficients):
+        with pytest.raises(ValueError):
+            Coefficients.updateCoefficient(10, 1.)
+
+    def test__updateCoefficient_throws_if_replacement_element_not_a_float(self, Coefficients):
+        with pytest.raises(TypeError):
+            Coefficients.updateCoefficient(1, 1)
+
+    def test__updateCoefficient_returns_new_array(self, Coefficients):
+        replacement_element = 2.
+        correct_output = np.array([1., 2.])
+        output = Coefficients.updateCoefficient(1, replacement_element)
+        npt.assert_array_equal(output, correct_output)
+
+
+
+
+
+
+
+
+
 
 
 
