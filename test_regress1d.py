@@ -337,6 +337,13 @@ class Test__Class_TrainingInputs:
         with pytest.raises(ValueError):
             new_inputs = Inputs.addTrainingExample(wrong_array)
 
+    def test__addTrainingExample_adds_correct_training_example(self, Inputs):
+        initial_array = np.array([1,2,3,4,5,6,7,8,9,10])
+        added_array = np.array([7,7,7,7,7,7,7,7,7,7])
+        correct_array = np.array([[1,2,3,4,5,6,7,8,9,10],[7,7,7,7,7,7,7,7,7,7]])
+        Inputs.addTrainingExample(added_array)
+        npt.assert_array_equal(correct_array, Input.training_inputs)
+
 ## Your feature_array is the wrong shape
 ## instead of (1,10), it should be (10,1)!!
 
