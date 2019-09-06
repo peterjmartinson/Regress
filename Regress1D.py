@@ -177,7 +177,7 @@ class TrainingInputs:
         if not isinstance(numpy_array, np.ndarray):
             raise TypeError('input must be a Numpy array')
         if len(numpy_array) != self.number_of_features:
-            raise ValueError('input must have ', self.number_of_features, ' elements!')
+            raise ValueError(f'input must be of size {self.number_of_features}!')
 
     
 # class TrainingTargets:

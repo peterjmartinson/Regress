@@ -15,6 +15,20 @@ def printDiagnostics(self):
 ## ======================================================= Pytest Fixtures
 
 @pytest.fixture
+def training_inputs():
+    return np.array([[1],[2],[3],[4],[5],[6],[7],[8],[9],[10]])
+
+@pytest.fixture
+def Inputs():
+    from Regress1D import TrainingInputs
+    return TrainingInputs(np.array([[1],[2],[3],[4],[5],[6],[7],[8],[9],[10]]))
+
+@pytest.fixture
+def Coefficients():
+    from Regress1D import Coefficients
+    return Coefficients(2)
+
+@pytest.fixture
 def model():
     from Regress1D import Model
     return Model()
@@ -31,16 +45,6 @@ def numpy_array():
 @pytest.fixture
 def feature_array():
     return np.array([1,2,3,4,5,6,7,8,9,10])
-
-@pytest.fixture
-def Inputs():
-    from Regress1D import TrainingInputs
-    return TrainingInputs(np.array([1,2,3,4,5,6,7,8,9,10]))
-
-@pytest.fixture
-def Coefficients():
-    from Regress1D import Coefficients
-    return Coefficients(2)
 
 @pytest.fixture
 def sample_X():
@@ -314,9 +318,9 @@ class Test__Class_TrainingInputs:
         assert Inputs.number_of_training_examples == correct_m
 
 
-    def test__getTrainingInputs_gets_the_right_inputs(self, Inputs, feature_array):
+    def test__getTrainingInputs_gets_the_right_inputs(self, Inputs, training_inputs):
         gotten_inputs = Inputs.getTrainingInputs()
-        npt.assert_array_equal(gotten_inputs, feature_array)
+        npt.assert_array_equal(gotten_inputs, training_inputs)
 
     def test__getNumberOfTrainingExamples_gets_the_right_number(self, Inputs, m):
         gotten_number = Inputs.getNumberOfTrainingExamples()
@@ -337,15 +341,20 @@ class Test__Class_TrainingInputs:
         with pytest.raises(ValueError):
             new_inputs = Inputs.addTrainingExample(wrong_array)
 
-    def test__addTrainingExample_adds_correct_training_example(self, Inputs):
-        initial_array = np.array([1,2,3,4,5,6,7,8,9,10])
-        added_array = np.array([7,7,7,7,7,7,7,7,7,7])
-        correct_array = np.array([[1,2,3,4,5,6,7,8,9,10],[7,7,7,7,7,7,7,7,7,7]])
-        Inputs.addTrainingExample(added_array)
-        npt.assert_array_equal(correct_array, Input.training_inputs)
+    def test__addTrainingExample_adds_correct_training_example(self, Inputs, training_inputs):
+        initial_array = training_inputs
+        added_training_example = np.array([3])
+        correct_array = np.vstack((initial_array, added_training_example))
+        Inputs.addTrainingExample(added_training_example)
+        print(f'correct array:  {correct_array}')
+        print(f'added_training_example:  {added_training_example}')
+        print(f'resulting array:  {Inputs.training_inputs}')
+        npt.assert_array_equal(correct_array, Inputs.training_inputs)
 
 ## Your feature_array is the wrong shape
 ## instead of (1,10), it should be (10,1)!!
+## if there is only one feature, array should be [[1],[2],[3],...]
+## if there are two or more features, should be [[1,1],[2,2],[3,3],...]
 
 
 class Test_Class_Coefficients:
