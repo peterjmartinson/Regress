@@ -5,7 +5,7 @@ class Model:
     """Provides a linear regression model"""
     
     def __init__(self):
-        self.X     = None # Feature array
+        self.X     = None # Training input set
         self.y     = None # Target array
         self.m     = None # Number of training examples
         self.n     = None # Number of features
@@ -31,15 +31,34 @@ class Model:
         if not isinstance(numpy_array, np.ndarray):
             raise TypeError('input must be a Numpy array')
         if self.X is None:
-            self.setNumberOfTrainingExamples(numpy_array)
-            self.X = np.vstack((np.ones((1, self.m)), numpy_array))
+            self.X = TrainingInputs(numpy_array)
+            self.m = self.X.getNumberOfTrainingExamples()
+            self.n = self.X.getNumberOfFeatures()
+            # self.setNumberOfTrainingExamples(numpy_array)
+            # self.X = np.vstack((np.ones((1, self.m)), numpy_array))
         else:
-            if len(numpy_array) == self.m:
-                self.X = np.vstack((self.X, numpy_array))
+            if len(numpy_array) == self.n:
+                self.X.addTrainingExample(numpy_array)
+                # self.X = np.vstack((self.X, numpy_array))
             else:
                 raise TypeError('input array is not the right size')
-        self.incrementNumberOfFeatures()
+        self.m = self.X.getNumberOfTrainingExamples()
+        # self.incrementNumberOfFeatures()
         self.addAnotherTheta()
+
+    # def setFeatures(self, numpy_array):
+    #     if not isinstance(numpy_array, np.ndarray):
+    #         raise TypeError('input must be a Numpy array')
+    #     if self.X is None:
+    #         self.setNumberOfTrainingExamples(numpy_array)
+    #         self.X = np.vstack((np.ones((1, self.m)), numpy_array))
+    #     else:
+    #         if len(numpy_array) == self.m:
+    #             self.X = np.vstack((self.X, numpy_array))
+    #         else:
+    #             raise TypeError('input array is not the right size')
+    #     self.incrementNumberOfFeatures()
+    #     self.addAnotherTheta()
 
     def getFeatures(self):
         return self.X
@@ -179,6 +198,7 @@ class TrainingInputs:
         if len(numpy_array) != self.number_of_features:
             raise ValueError(f'input must be of size {self.number_of_features}!')
         self.training_inputs = np.vstack((self.training_inputs, numpy_array))
+        self.number_of_training_examples += 1
         return self.training_inputs
 
     

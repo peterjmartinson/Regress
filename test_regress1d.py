@@ -70,6 +70,28 @@ class TestCanary:
     def test_Tweets(self):
         assert 1 == 1
 
+class Test_Model:
+
+    def test__Set_X_if_X_is_Empty(self, model, training_inputs_X):
+        correct_X = training_inputs
+        model.setFeatures(training_inputs)
+        npt.assert_array_equal(model.X.training_inputs, correct_X)
+
+    def test__Append_Array_if_X_is_Set(self, model, Inputs, training_inputs, sample_X):
+        model.X = Inputs
+        model.m = model.X.getNumberOfTrainingExamples()
+        model.n = model.X.getNumberOfFeatures()
+        added_training_example = np.array([3])
+        correct_X = np.vstack((training_inputs, added_training_example))
+        model.setFeatures(added_training_example)
+        npt.assert_array_equal(model.X.training_inputs, correct_X)
+
+    def test__Increment_m_if_X_is_Set(self, model, training_inputs):
+        added_training_example = np.array([3])
+        model.setFeatures(training_inputs)
+        model.setFeatures(added_training_example)
+        assert model.m == 11
+
 class Test_setFeatures:
 
     def test__Exists(self, model):
@@ -79,11 +101,6 @@ class Test_setFeatures:
         not_an_array = "not a Numpy ndarray"
         with pytest.raises(TypeError):
             model.setFeatures(not_an_array)
-
-    def test__Set_X_if_X_is_Empty(self, model, feature_array, sample_X):
-        correct_X = sample_X
-        model.setFeatures(feature_array)
-        npt.assert_array_equal(model.X, correct_X)
 
     def test__Set_m_if_X_is_Empty(self, model, feature_array, m):
         model.setFeatures(feature_array)
@@ -95,21 +112,9 @@ class Test_setFeatures:
         with pytest.raises(TypeError):
             model.setFeatures(feature_array)
 
-    def test__Append_Array_if_X_is_Set(self, model, feature_array, sample_X):
-        model.X = sample_X
-        model.m = 10
-        correct_X = np.vstack((sample_X, feature_array))
-        model.setFeatures(feature_array)
-        npt.assert_array_equal(model.X, correct_X)
-
     def test__Set_n_equal_to_1_if_X_is_Empty(self, model, feature_array):
         model.setFeatures(feature_array)
         assert model.n == 1
-
-    def test__Increment_n_if_X_is_Set(self, model, feature_array):
-        model.setFeatures(feature_array)
-        model.setFeatures(feature_array)
-        assert model.n == 2
 
     def test__Set_theta_if_theta_is_not_yet_set(self, model, feature_array):
         correct_theta = np.array([1, 1])
@@ -336,6 +341,13 @@ class Test__Class_TrainingInputs:
         correct_array = np.vstack((initial_array, added_training_example))
         Inputs.addTrainingExample(added_training_example)
         npt.assert_array_equal(correct_array, Inputs.training_inputs)
+
+    def test__addTrainingExample_increments_number_of_training_examples(self, Inputs):
+        added_training_example = np.array([3])
+        correct_number_of_training_examples = 11
+        Inputs.addTrainingExample(added_training_example)
+        assert Inputs.number_of_training_examples == correct_number_of_training_examples
+        
 
 ## Your feature_array is the wrong shape
 ## instead of (1,10), it should be (10,1)!!
