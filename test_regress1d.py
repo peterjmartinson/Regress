@@ -72,7 +72,7 @@ class TestCanary:
 
 class Test_Model:
 
-    def test__Set_X_if_X_is_Empty(self, model, training_inputs_X):
+    def test__Set_X_if_X_is_Empty(self, model, training_inputs):
         correct_X = training_inputs
         model.setFeatures(training_inputs)
         npt.assert_array_equal(model.X.training_inputs, correct_X)
