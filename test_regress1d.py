@@ -283,40 +283,29 @@ class Test__Class_ResidualSumOfSquares:
 
 class Test__Class_TrainingInputs:
 
-    # def test__Exists(self, Inputs):
-    #     assert Inputs != None
-
-    # def test__setInputs_exists(self, Inputs):
-    #     assert hasattr(Inputs, 'setInputs')
-
-    # def test__Exists(self, model):
-    #     assert hasattr(model, 'setFeatures')
-
     def test__Initializing_takes_numpy_array(self):
         from Regress1D import TrainingInputs
         not_an_array = "not a Numpy ndarray"
         with pytest.raises(TypeError):
             Inputs = TrainingInputs(not_an_array)
 
-    def test__Initializing_sets_training_inputs(self, feature_array):
-        x_0 = np.ones(10)
-        correct_training_set = feature_array
+    def test__Initializing_sets_training_inputs(self, training_inputs):
+        correct_training_set = training_inputs
         from Regress1D import TrainingInputs
-        Inputs = TrainingInputs(feature_array)
+        Inputs = TrainingInputs(training_inputs)
         npt.assert_array_equal(Inputs.training_inputs, correct_training_set)
 
-    def test__Initializing_sets_number_of_features(self, feature_array):
+    def test__Initializing_sets_number_of_features(self, training_inputs):
         correct_n = 1
         from Regress1D import TrainingInputs
-        Inputs = TrainingInputs(feature_array)
+        Inputs = TrainingInputs(training_inputs)
         assert Inputs.number_of_features == correct_n
 
-    def test__Initializing_sets_number_of_training_examples(self, feature_array):
+    def test__Initializing_sets_number_of_training_examples(self, training_inputs):
         correct_m = 10
         from Regress1D import TrainingInputs
-        Inputs = TrainingInputs(feature_array)
+        Inputs = TrainingInputs(training_inputs)
         assert Inputs.number_of_training_examples == correct_m
-
 
     def test__getTrainingInputs_gets_the_right_inputs(self, Inputs, training_inputs):
         gotten_inputs = Inputs.getTrainingInputs()
@@ -346,9 +335,6 @@ class Test__Class_TrainingInputs:
         added_training_example = np.array([3])
         correct_array = np.vstack((initial_array, added_training_example))
         Inputs.addTrainingExample(added_training_example)
-        print(f'correct array:  {correct_array}')
-        print(f'added_training_example:  {added_training_example}')
-        print(f'resulting array:  {Inputs.training_inputs}')
         npt.assert_array_equal(correct_array, Inputs.training_inputs)
 
 ## Your feature_array is the wrong shape
