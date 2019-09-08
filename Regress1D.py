@@ -132,7 +132,6 @@ class ResidualSumOfSquares:
         print("J = ", J)
         return J
 
-
     def getDerivative(self):
         if self.X is None:
             raise ValueError('X contains no data!')

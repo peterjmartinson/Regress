@@ -15,10 +15,6 @@ def printDiagnostics(self):
 ## ======================================================= Pytest Fixtures
 
 @pytest.fixture
-def training_inputs():
-    return np.array([[1],[2],[3],[4],[5],[6],[7],[8],[9],[10]])
-
-@pytest.fixture
 def Inputs():
     from Regress1D import TrainingInputs
     return TrainingInputs(np.array([[1],[2],[3],[4],[5],[6],[7],[8],[9],[10]]))
@@ -27,6 +23,14 @@ def Inputs():
 def Coefficients():
     from Regress1D import Coefficients
     return Coefficients(2)
+
+@pytest.fixture
+def training_inputs():
+    return np.array([[1],[2],[3],[4],[5],[6],[7],[8],[9],[10]])
+
+@pytest.fixture
+def added_training_example():
+    return np.array([3])
 
 @pytest.fixture
 def model():
@@ -77,17 +81,15 @@ class Test_Model:
         model.setFeatures(training_inputs)
         npt.assert_array_equal(model.X.training_inputs, correct_X)
 
-    def test__Append_Array_if_X_is_Set(self, model, Inputs, training_inputs, sample_X):
+    def test__Append_Array_if_X_is_Set(self, model, Inputs, training_inputs, sample_X, added_training_example):
         model.X = Inputs
         model.m = model.X.getNumberOfTrainingExamples()
         model.n = model.X.getNumberOfFeatures()
-        added_training_example = np.array([3])
         correct_X = np.vstack((training_inputs, added_training_example))
         model.setFeatures(added_training_example)
         npt.assert_array_equal(model.X.training_inputs, correct_X)
 
-    def test__Increment_m_if_X_is_Set(self, model, training_inputs):
-        added_training_example = np.array([3])
+    def test__Increment_m_if_X_is_Set(self, model, training_inputs, added_training_example):
         model.setFeatures(training_inputs)
         model.setFeatures(added_training_example)
         assert model.m == 11
@@ -120,14 +122,6 @@ class Test_setFeatures:
         correct_theta = np.array([1, 1])
         model.setFeatures(feature_array)
         npt.assert_array_equal(model.theta, correct_theta)
-
-    def test__Add_another_theta_if_theta_is_already_set(self, model, feature_array):
-        correct_theta = np.array([1,1,1,1])
-        model.setFeatures(feature_array)
-        model.setFeatures(feature_array)
-        model.setFeatures(feature_array)
-        npt.assert_array_equal(model.theta, correct_theta)
-
 
 class Test_setTargets:
 
@@ -178,10 +172,14 @@ class Test_getDerivativeOfJ:
         with pytest.raises(ValueError):
             model.getDerivativeOfJ()
 
-    def test_Returns_an_appropriate_derivative(self, model, feature_array, target_array):
+    def test_Returns_an_appropriate_derivative(self, model, training_inputs, target_array):
         correct_dJ = [-2.85, -21.45]
-        model.setFeatures(feature_array)
+        model.setFeatures(training_inputs)
         model.setTargets(target_array)
+        print(f'X:  {model.X.getTrainingInputs()}')
+        print(f'self.m:  {model.m}')
+        print(f'self.getHypothesis():  {model.getHypothesis()}')
+        print(f'self.y:  {model.y}')
         result_dJ = model.getDerivativeOfJ()
         npt.assert_array_equal(result_dJ, correct_dJ)
 
