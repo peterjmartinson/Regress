@@ -75,7 +75,8 @@ class Model:
 
     # H(xi) = theta_0 + theta_1 * xi
     def getHypothesis(self):
-        h = np.sum(self.theta * self.X.T, axis=1)
+        # h = np.sum(self.theta * self.X.getTrainingInputs(), axis=1)
+        h = self.theta[0]*1 + np.sum(self.theta[1:] * self.X.getTrainingInputs(), axis=1)
         return h
 
     # J(theta_0, theta_1) = 1/2m sum_i=1^m [ (H(xi)-yi)^2 ]
@@ -90,6 +91,8 @@ class Model:
         print("J = ", J)
         return J
 
+    ## Note: the following is *only* valid for one-dimensional hypotheses,
+    ## i.e. those with only two coefficients
     def getDerivativeOfJ(self):
         if self.X is None:
             raise ValueError('X contains no data!')
@@ -101,7 +104,8 @@ class Model:
             raise ValueError('m is zero!  Division by Zero!')
         dJ = np.array([
             (1/self.m) * np.sum( (self.getHypothesis() - self.y) ),
-            (1/self.m) * np.sum( (self.getHypothesis() - self.y) * self.X[1:])
+            (1/self.m) * np.sum( (self.getHypothesis() - self.y) * self.X.getTrainingInputs().T)
+            # (1/self.m) * np.sum( (self.getHypothesis() - self.y) * self.X[1:])
         ])
         return dJ
 
@@ -111,7 +115,7 @@ class Model:
             raise ValueError('theta contains no data!')
         if self.a is None:
             raise ValueError('a contains no data!')
-        self.getDerivativeOfJ()
+        # self.getDerivativeOfJ()
         temp_theta = self.theta - self.a - self.getDerivativeOfJ()
         self.theta = temp_theta
 

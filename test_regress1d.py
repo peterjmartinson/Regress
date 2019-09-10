@@ -79,6 +79,9 @@ class Test_Model:
     def test__Set_X_if_X_is_Empty(self, model, training_inputs):
         correct_X = training_inputs
         model.setFeatures(training_inputs)
+        print(f'correct_X:  {correct_X}')
+        print(f'training_inputs:  {training_inputs}')
+        print(f'model.X.training_inputs:  {model.X.training_inputs}')
         npt.assert_array_equal(model.X.training_inputs, correct_X)
 
     def test__Append_Array_if_X_is_Set(self, model, Inputs, training_inputs, sample_X, added_training_example):
@@ -104,23 +107,23 @@ class Test_setFeatures:
         with pytest.raises(TypeError):
             model.setFeatures(not_an_array)
 
-    def test__Set_m_if_X_is_Empty(self, model, feature_array, m):
-        model.setFeatures(feature_array)
+    def test__Set_m_if_X_is_Empty(self, model, training_inputs, m):
+        model.setFeatures(training_inputs)
         assert m == model.m
 
-    def test__Throw_Exception_if_Array_is_Wrong_Size(self, model, feature_array):
+    def test__Throw_Exception_if_Array_is_Wrong_Size(self, model, training_inputs):
         model.X = np.array([1.,1.,1.,1.])
         model.m = 4
         with pytest.raises(TypeError):
-            model.setFeatures(feature_array)
+            model.setFeatures(training_inputs)
 
-    def test__Set_n_equal_to_1_if_X_is_Empty(self, model, feature_array):
-        model.setFeatures(feature_array)
+    def test__Set_n_equal_to_1_if_X_is_Empty(self, model, training_inputs):
+        model.setFeatures(training_inputs)
         assert model.n == 1
 
-    def test__Set_theta_if_theta_is_not_yet_set(self, model, feature_array):
+    def test__Set_theta_if_theta_is_not_yet_set(self, model, training_inputs):
         correct_theta = np.array([1, 1])
-        model.setFeatures(feature_array)
+        model.setFeatures(training_inputs)
         npt.assert_array_equal(model.theta, correct_theta)
 
 class Test_setTargets:
@@ -133,14 +136,14 @@ class Test_setTargets:
         with pytest.raises(TypeError):
             model.setTargets(not_an_array)
 
-    def test__Throws_if_y_has_not_m_elements(self, model, feature_array, target_array):
+    def test__Throws_if_y_has_not_m_elements(self, model, training_inputs, target_array):
         bad_target_array = np.array([1, 2, 3])
-        model.setFeatures(feature_array)
+        model.setFeatures(training_inputs)
         with pytest.raises(ValueError):
             model.setTargets(bad_target_array)
 
-    def test__Sets_y(self, model, feature_array, target_array):
-        model.setFeatures(feature_array)
+    def test__Sets_y(self, model, training_inputs, target_array):
+        model.setFeatures(training_inputs)
         model.setTargets(target_array)
         npt.assert_array_equal(model.y, target_array)
 
@@ -153,20 +156,20 @@ class Test_getDerivativeOfJ:
         with pytest.raises(ValueError):
             model.getDerivativeOfJ()
 
-    def test__Throws_If_y_Is_None(self, model, feature_array):
-        model.setFeatures(feature_array)
+    def test__Throws_If_y_Is_None(self, model, training_inputs):
+        model.setFeatures(training_inputs)
         with pytest.raises(ValueError):
             model.getDerivativeOfJ()
 
-    def test__Throws_if_m_is_None(self, model, feature_array, target_array):
-        model.setFeatures(feature_array)
+    def test__Throws_if_m_is_None(self, model, training_inputs, target_array):
+        model.setFeatures(training_inputs)
         model.setTargets(target_array)
         model.m = None
         with pytest.raises(ValueError):
             model.getDerivativeOfJ()
 
-    def test__Throws_if_m_is_zero(self, model, feature_array, target_array):
-        model.setFeatures(feature_array)
+    def test__Throws_if_m_is_zero(self, model, training_inputs, target_array):
+        model.setFeatures(training_inputs)
         model.setTargets(target_array)
         model.m = 0
         with pytest.raises(ValueError):
@@ -177,11 +180,34 @@ class Test_getDerivativeOfJ:
         model.setFeatures(training_inputs)
         model.setTargets(target_array)
         print(f'X:  {model.X.getTrainingInputs()}')
+        print(f'theta:  {model.theta}')
         print(f'self.m:  {model.m}')
         print(f'self.getHypothesis():  {model.getHypothesis()}')
         print(f'self.y:  {model.y}')
+        print(f'derivative of J:  {model.getDerivativeOfJ()}')
         result_dJ = model.getDerivativeOfJ()
         npt.assert_array_equal(result_dJ, correct_dJ)
+
+    def test__Changes_value_of_theta_0(self, model, training_inputs, target_array):
+        model.setFeatures(training_inputs)
+        model.setTargets(target_array)
+        initial_theta_0 = model.theta[0]
+        print("initial theta 0 = ", initial_theta_0)
+        model.evaluateNewThetas()
+        print("final theta 0 = ", model.theta[0])
+        assert initial_theta_0 != model.theta[0]
+
+    def test__Changes_all_theta_values(self, model, training_inputs, target_array):
+        model.setFeatures(training_inputs)
+        model.setTargets(target_array)
+        d = np.zeros(len(model.theta))
+        initial_theta = model.theta
+        print("initial theta = ", initial_theta)
+        model.evaluateNewThetas()
+        d = initial_theta - model.theta
+        print("final theta = ", model.theta)
+        print("d = ", d)
+        assert d.sum() != 0
 
 
 class Test__evaluateNewThetas:
@@ -189,54 +215,33 @@ class Test__evaluateNewThetas:
     def test__Exists(self, model):
         assert hasattr(model, 'evaluateNewThetas')
 
-    def test__Throws_If_theta_Is_None(self, model, feature_array, target_array):
-        model.setFeatures(feature_array)
+    def test__Throws_If_theta_Is_None(self, model, training_inputs, target_array):
+        model.setFeatures(training_inputs)
         model.setTargets(target_array)
         model.theta = None
         with pytest.raises(ValueError):
             model.evaluateNewThetas()
 
-    def test__Throws_If_a_Is_None(self, model, feature_array, target_array):
-        model.setFeatures(feature_array)
+    def test__Throws_If_a_Is_None(self, model, training_inputs, target_array):
+        model.setFeatures(training_inputs)
         model.setTargets(target_array)
         model.a = None
         with pytest.raises(ValueError):
             model.evaluateNewThetas()
-
-    def test__Changes_value_of_theta_0(self, model, feature_array, target_array):
-        model.setFeatures(feature_array)
-        model.setTargets(target_array)
-        initial_theta_0 = model.theta[0]
-        model.evaluateNewThetas()
-        print("initial theta 0 = ", initial_theta_0)
-        print("final theta 0 = ", model.theta[0])
-        assert initial_theta_0 != model.theta[0]
-
-    def test__Changes_all_theta_values(self, model, feature_array, target_array):
-        model.setFeatures(feature_array)
-        model.setTargets(target_array)
-        d = np.zeros(len(model.theta))
-        initial_theta = model.theta
-        model.evaluateNewThetas()
-        d = initial_theta - model.theta
-        print("initial theta = ", initial_theta)
-        print("final theta = ", model.theta)
-        print("d = ", d)
-        assert d.sum() != 0
 
 class Test__getJ:
 
     def test__Exists(self, model):
         assert hasattr(model, 'getJ')
 
-    def test__Returns_a_float(self, model, feature_array, target_array):
-        model.setFeatures(feature_array)
+    def test__Returns_a_float(self, model, training_inputs, target_array):
+        model.setFeatures(training_inputs)
         model.setTargets(target_array)
         J = model.getJ()
         assert isinstance(J, float)
 
-    def test__Returns_correct_J(self, model, feature_array, target_array):
-        model.setFeatures(feature_array)
+    def test__Returns_correct_J(self, model, training_inputs, target_array):
+        model.setFeatures(training_inputs)
         model.setTargets(target_array)
         correct_J = 6.082499999999999
         J = model.getJ()
@@ -252,14 +257,14 @@ class Test__getHypothesis:
     def test__Exists(self, model):
         assert hasattr(model, 'getHypothesis')
 
-    def test__Returns_numpy_array(self, model, feature_array, target_array):
-        model.setFeatures(feature_array)
+    def test__Returns_numpy_array(self, model, training_inputs, target_array):
+        model.setFeatures(training_inputs)
         model.setTargets(target_array)
         H = model.getHypothesis()
         assert isinstance(H, np.ndarray)
 
-    def test__Resulting_hypothesis_is_1_by_m(self, model, feature_array, target_array):
-        model.setFeatures(feature_array)
+    def test__Resulting_hypothesis_is_1_by_m(self, model, training_inputs, target_array):
+        model.setFeatures(training_inputs)
         model.setTargets(target_array)
         h = model.getHypothesis()
         m = model.m
@@ -274,11 +279,11 @@ class Test__Class_ResidualSumOfSquares:
     def test__getValue_exists(self, RSS):
         assert hasattr(RSS, 'getValue')
 
-    def test__getValue_returns_a_float(self, RSS, model, feature_array, target_array, hypothesis):
+    def test__getValue_returns_a_float(self, RSS, model, training_inputs, target_array, hypothesis):
         J = RSS.getValue(hypothesis, target_array)
         assert isinstance(J, float)
 
-    def test__getValue_returns_correct_J(self, RSS, model, feature_array, target_array, hypothesis):
+    def test__getValue_returns_correct_J(self, RSS, model, training_inputs, target_array, hypothesis):
         correct_J = 6.082499999999999
         J = RSS.getValue(hypothesis, target_array)
         assert J == correct_J
