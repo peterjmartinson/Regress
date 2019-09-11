@@ -124,7 +124,7 @@ class Test_setFeatures:
     def test__Set_theta_if_theta_is_not_yet_set(self, model, training_inputs):
         correct_theta = np.array([1, 1])
         model.setFeatures(training_inputs)
-        npt.assert_array_equal(model.theta, correct_theta)
+        npt.assert_array_equal(model.theta.getCoefficients(), correct_theta)
 
 class Test_setTargets:
 
