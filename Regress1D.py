@@ -23,10 +23,8 @@ class Model:
 
     def addAnotherTheta(self):
         if self.theta is None:
-            # self.theta = np.array([1, 1])
             self.theta = Coefficients(self.X.getNumberOfFeatures())
         else:
-            # self.theta = np.append(self.theta, [1])
             self.theta = self.theta.addCoefficient()
 
     def setFeatures(self, numpy_array):
@@ -100,7 +98,6 @@ class Model:
         temp_theta = self.theta.getCoefficients() - self.a - self.getDerivativeOfJ()
         for i in range(len(temp_theta)):
             self.theta.updateCoefficient(i, temp_theta[i])
-        # self.theta = temp_theta
 
 class ResidualSumOfSquares:
     """This is what Ng calls the 'Cost Function', or J"""
