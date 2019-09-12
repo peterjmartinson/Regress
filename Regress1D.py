@@ -105,7 +105,7 @@ class ResidualSumOfSquares:
     def __init__(self):
         pass
 
-    def getValue(self, hypothesis, targets):
+    def getValue(self, targets, hypothesis):
         h = hypothesis
         y = targets
         m = len(y)
@@ -116,9 +116,11 @@ class ResidualSumOfSquares:
         print("J = ", J)
         return J
 
-    def getDerivative(self, hypothesis, targets, inputs):
+    def getDerivative(self, inputs, targets, hypothesis):
+        # targets must be a numpy array
+        # inputs must be a numpy array
         h = hypothesis
-        x = inputs
+        x = inputs.T
         y = targets
         m = len(y)
         if y is None:

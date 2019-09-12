@@ -186,7 +186,6 @@ class Test_getDerivativeOfJ:
         print(f'self.y:  {model.y}')
         print(f'derivative of J:  {model.getDerivativeOfJ()}')
         result_dJ = model.getDerivativeOfJ()
-        #assert 1==2
         npt.assert_array_equal(result_dJ, correct_dJ)
 
     def test__Changes_value_of_theta_0(self, model, training_inputs, target_array):
@@ -279,24 +278,21 @@ class Test__Class_ResidualSumOfSquares:
         assert hasattr(RSS, 'getValue')
 
     def test__getValue_returns_a_float(self, RSS, model, training_inputs, target_array, hypothesis):
-        J = RSS.getValue(hypothesis, target_array)
+        J = RSS.getValue(target_array, hypothesis)
         assert isinstance(J, float)
 
     def test__getValue_returns_correct_J(self, RSS, model, training_inputs, target_array, hypothesis):
         correct_J = 6.082499999999999
-        J = RSS.getValue(hypothesis, target_array)
+        J = RSS.getValue(target_array, hypothesis)
         assert J == correct_J
 
     def test_getDerivative_returns_an_appropriate_derivative(self, RSS, training_inputs, target_array, hypothesis):
         correct_dJ = [-2.85, -21.45]
-        # model.setFeatures(training_inputs)
-        # model.setTargets(target_array)
         print(f'X:  {training_inputs}')
-        # print(f'theta:  {model.theta.getCoefficients()}')
         print(f'self.m:  {len(target_array)}')
         print(f'hypothesis:  {hypothesis}')
         print(f'y:  {target_array}')
-        result_dJ = RSS.getDerivative(hypothesis, target_array, training_inputs)
+        result_dJ = RSS.getDerivative(training_inputs, target_array, hypothesis)
         print(f'derivative of J:  {result_dJ}')
         print(f'expected dJ: {correct_dJ}')
         npt.assert_array_equal(result_dJ, correct_dJ)
