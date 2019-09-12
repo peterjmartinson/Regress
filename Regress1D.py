@@ -23,9 +23,9 @@ class Model:
 
     def addAnotherTheta(self):
         if self.theta is None:
-            self.theta = np.array([1, 1])
+            self.theta = Coefficients(self.X.getNumberOfFeatures())
         else:
-            self.theta = np.append(self.theta, [1])
+            self.theta = self.theta.addCoefficient()
 
     def setFeatures(self, numpy_array):
         if not isinstance(numpy_array, np.ndarray):
@@ -34,31 +34,13 @@ class Model:
             self.X = TrainingInputs(numpy_array)
             self.m = self.X.getNumberOfTrainingExamples()
             self.n = self.X.getNumberOfFeatures()
-            # self.setNumberOfTrainingExamples(numpy_array)
-            # self.X = np.vstack((np.ones((1, self.m)), numpy_array))
         else:
             if len(numpy_array) == self.n:
                 self.X.addTrainingExample(numpy_array)
-                # self.X = np.vstack((self.X, numpy_array))
             else:
                 raise TypeError('input array is not the right size')
         self.m = self.X.getNumberOfTrainingExamples()
-        # self.incrementNumberOfFeatures()
         self.addAnotherTheta()
-
-    # def setFeatures(self, numpy_array):
-    #     if not isinstance(numpy_array, np.ndarray):
-    #         raise TypeError('input must be a Numpy array')
-    #     if self.X is None:
-    #         self.setNumberOfTrainingExamples(numpy_array)
-    #         self.X = np.vstack((np.ones((1, self.m)), numpy_array))
-    #     else:
-    #         if len(numpy_array) == self.m:
-    #             self.X = np.vstack((self.X, numpy_array))
-    #         else:
-    #             raise TypeError('input array is not the right size')
-    #     self.incrementNumberOfFeatures()
-    #     self.addAnotherTheta()
 
     def getFeatures(self):
         return self.X
@@ -75,8 +57,7 @@ class Model:
 
     # H(xi) = theta_0 + theta_1 * xi
     def getHypothesis(self):
-        # h = np.sum(self.theta * self.X.getTrainingInputs(), axis=1)
-        h = self.theta[0]*1 + np.sum(self.theta[1:] * self.X.getTrainingInputs(), axis=1)
+        h = self.theta.getCoefficients()[0]*1 + np.sum(self.theta.getCoefficients()[1:] * self.X.getTrainingInputs(), axis=1)
         return h
 
     # J(theta_0, theta_1) = 1/2m sum_i=1^m [ (H(xi)-yi)^2 ]
@@ -105,7 +86,6 @@ class Model:
         dJ = np.array([
             (1/self.m) * np.sum( (self.getHypothesis() - self.y) ),
             (1/self.m) * np.sum( (self.getHypothesis() - self.y) * self.X.getTrainingInputs().T)
-            # (1/self.m) * np.sum( (self.getHypothesis() - self.y) * self.X[1:])
         ])
         return dJ
 
@@ -115,9 +95,9 @@ class Model:
             raise ValueError('theta contains no data!')
         if self.a is None:
             raise ValueError('a contains no data!')
-        # self.getDerivativeOfJ()
-        temp_theta = self.theta - self.a - self.getDerivativeOfJ()
-        self.theta = temp_theta
+        temp_theta = self.theta.getCoefficients() - self.a - self.getDerivativeOfJ()
+        for i in range(len(temp_theta)):
+            self.theta.updateCoefficient(i, temp_theta[i])
 
 class ResidualSumOfSquares:
     """This is what Ng calls the 'Cost Function', or J"""
@@ -215,7 +195,7 @@ class Coefficients:
     def __init__(self, number_of_features):
         if not isinstance(number_of_features, int):
             raise TypeError('input must be an integer')
-        self.c = np.ones(number_of_features)
+        self.c = np.ones(number_of_features + 1)
 
     def getCoefficients(self):
         return self.c
