@@ -116,18 +116,18 @@ class ResidualSumOfSquares:
         print("J = ", J)
         return J
 
-    def getDerivative(self):
-        if self.X is None:
-            raise ValueError('X contains no data!')
-        if self.y is None:
+    def getDerivative(self, hypothesis, targets, inputs):
+        h = hypothesis
+        x = inputs
+        y = targets
+        m = len(y)
+        if y is None:
             raise ValueError('y contains no data!')
-        if self.m is None:
-            raise ValueError('m contains no data!')
-        if self.m == 0:
+        if m == 0:
             raise ValueError('m is zero!  Division by Zero!')
         dJ = np.array([
-            (1/self.m) * np.sum( (self.getHypothesis() - self.y) ),
-            (1/self.m) * np.sum( (self.getHypothesis() - self.y) * self.X[1:])
+            (1/m) * np.sum( (h - y) ),
+            (1/m) * np.sum( (h - y) * x)
         ])
         return dJ
 

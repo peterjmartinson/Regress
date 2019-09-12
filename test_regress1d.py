@@ -175,18 +175,18 @@ class Test_getDerivativeOfJ:
         with pytest.raises(ValueError):
             model.getDerivativeOfJ()
 
-    def test_Returns_an_appropriate_derivative(self, model, training_inputs, target_array):
-        correct_dJ = [-2.85, -21.45]
-        model.setFeatures(training_inputs)
-        model.setTargets(target_array)
-        print(f'X:  {model.X.getTrainingInputs()}')
-        print(f'theta:  {model.theta}')
-        print(f'self.m:  {model.m}')
-        print(f'self.getHypothesis():  {model.getHypothesis()}')
-        print(f'self.y:  {model.y}')
-        print(f'derivative of J:  {model.getDerivativeOfJ()}')
-        result_dJ = model.getDerivativeOfJ()
-        npt.assert_array_equal(result_dJ, correct_dJ)
+#    def test_Returns_an_appropriate_derivative(self, model, training_inputs, target_array):
+#        correct_dJ = [-2.85, -21.45]
+#        model.setFeatures(training_inputs)
+#        model.setTargets(target_array)
+#        print(f'X:  {model.X.getTrainingInputs()}')
+#        print(f'theta:  {model.theta}')
+#        print(f'self.m:  {model.m}')
+#        print(f'self.getHypothesis():  {model.getHypothesis()}')
+#        print(f'self.y:  {model.y}')
+#        print(f'derivative of J:  {model.getDerivativeOfJ()}')
+#        result_dJ = model.getDerivativeOfJ()
+#        npt.assert_array_equal(result_dJ, correct_dJ)
 
     def test__Changes_value_of_theta_0(self, model, training_inputs, target_array):
         model.setFeatures(training_inputs)
@@ -285,6 +285,20 @@ class Test__Class_ResidualSumOfSquares:
         correct_J = 6.082499999999999
         J = RSS.getValue(hypothesis, target_array)
         assert J == correct_J
+
+    def test_getDerivative_returns_an_appropriate_derivative(self, RSS, training_inputs, target_array, hypothesis):
+        correct_dJ = [-2.85, -21.45]
+        # model.setFeatures(training_inputs)
+        # model.setTargets(target_array)
+        print(f'X:  {training_inputs}')
+        # print(f'theta:  {model.theta}')
+        print(f'self.m:  {len(target_array)}')
+        print(f'hypothesis:  {hypothesis}')
+        print(f'y:  {target_array}')
+        result_dJ = RSS.getDerivative(hypothesis, target_array, training_inputs)
+        print(f'derivative of J:  {result_dJ}')
+        print(f'expected dJ: {correct_dJ}')
+        npt.assert_array_equal(result_dJ, correct_dJ)
 
 
 class Test__Class_TrainingInputs:
