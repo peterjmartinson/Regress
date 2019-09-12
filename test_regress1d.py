@@ -191,23 +191,21 @@ class Test_getDerivativeOfJ:
     def test__Changes_value_of_theta_0(self, model, training_inputs, target_array):
         model.setFeatures(training_inputs)
         model.setTargets(target_array)
-        initial_theta_0 = model.theta[0]
+        initial_theta_0 = model.theta.getCoefficients()[0]
         print("initial theta 0 = ", initial_theta_0)
         model.evaluateNewThetas()
-        print("final theta 0 = ", model.theta[0])
-        assert initial_theta_0 != model.theta[0]
+        print("final theta 0 = ", model.theta.getCoefficients()[0])
+        assert initial_theta_0 != model.theta.getCoefficients()[0]
 
     def test__Changes_all_theta_values(self, model, training_inputs, target_array):
         model.setFeatures(training_inputs)
         model.setTargets(target_array)
-        d = np.zeros(len(model.theta))
-        initial_theta = model.theta
-        print("initial theta = ", initial_theta)
+        d = np.ones(len(model.theta.getCoefficients()))
         model.evaluateNewThetas()
-        d = initial_theta - model.theta
-        print("final theta = ", model.theta)
+        d -= model.theta.getCoefficients()
+        print("final theta = ", model.theta.getCoefficients())
         print("d = ", d)
-        assert d.sum() != 0
+        assert d.sum() != 0.0
 
 
 class Test__evaluateNewThetas:
@@ -369,7 +367,7 @@ class Test_Class_Coefficients:
     def test__Initializing_sets_appropriate_array(self):
         from Regress1D import Coefficients
         n = 2
-        correct_array = np.array([1., 1.])
+        correct_array = np.array([1., 1., 1.])
         Coefficients = Coefficients(n)
         npt.assert_array_equal(Coefficients.c, correct_array)
 
@@ -379,7 +377,7 @@ class Test_Class_Coefficients:
     def test__getCoefficients_returns_correct_array(self):
         from Regress1D import Coefficients
         n = 2
-        correct_array = np.array([1., 1.])
+        correct_array = np.array([1., 1., 1.])
         Coefficients = Coefficients(n)
         c = Coefficients.getCoefficients()
         npt.assert_array_equal(c, correct_array)
@@ -395,7 +393,7 @@ class Test_Class_Coefficients:
     def test_addCoefficient_adds_one_element(self, Coefficients):
         Coefficients.addCoefficient()
         c = Coefficients.c
-        correct_array = np.array([1., 1., 1.])
+        correct_array = np.array([1., 1., 1., 1.])
         npt.assert_array_equal(c, correct_array)
 
     def test__Has_method_updateCoefficient(self, Coefficients):
@@ -411,7 +409,7 @@ class Test_Class_Coefficients:
 
     def test__updateCoefficient_returns_new_array(self, Coefficients):
         replacement_element = 2.
-        correct_output = np.array([1., 2.])
+        correct_output = np.array([1., 2., 1.])
         output = Coefficients.updateCoefficient(1, replacement_element)
         npt.assert_array_equal(output, correct_output)
 

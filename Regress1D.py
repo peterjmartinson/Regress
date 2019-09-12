@@ -97,8 +97,10 @@ class Model:
             raise ValueError('theta contains no data!')
         if self.a is None:
             raise ValueError('a contains no data!')
-        temp_theta = self.theta - self.a - self.getDerivativeOfJ()
-        self.theta = temp_theta
+        temp_theta = self.theta.getCoefficients() - self.a - self.getDerivativeOfJ()
+        for i in range(len(temp_theta)):
+            self.theta.updateCoefficient(i, temp_theta[i])
+        # self.theta = temp_theta
 
 class ResidualSumOfSquares:
     """This is what Ng calls the 'Cost Function', or J"""
