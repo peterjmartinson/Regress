@@ -117,16 +117,18 @@ class ResidualSumOfSquares:
         return J
 
     def getDerivative(self, inputs, targets, hypothesis):
-        # targets must be a numpy array
-        # inputs must be a numpy array
+        if not isinstance(inputs, np.ndarray):
+            raise TypeError('Input must be a Numpy array')
+        if not isinstance(targets, np.ndarray):
+            raise TypeError('Target must be a Numpy array')
+        if not isinstance(hypothesis, np.ndarray):
+            raise TypeError('Hypothesis must be a Numpy array')
+        if len(targets) == 0:
+            raise ZeroDivisionError('m is zero!  Division by Zero!')
         h = hypothesis
         x = inputs.T
         y = targets
         m = len(y)
-        if y is None:
-            raise ValueError('y contains no data!')
-        if m == 0:
-            raise ValueError('m is zero!  Division by Zero!')
         dJ = np.array([
             (1/m) * np.sum( (h - y) ),
             (1/m) * np.sum( (h - y) * x)

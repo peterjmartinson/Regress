@@ -297,6 +297,26 @@ class Test__Class_ResidualSumOfSquares:
         print(f'expected dJ: {correct_dJ}')
         npt.assert_array_equal(result_dJ, correct_dJ)
 
+    def test__Throws_if_input_is_not_numpy_array(self, RSS, target_array, hypothesis):
+        training_inputs = 'not an array'
+        with pytest.raises(TypeError):
+            RSS.getDerivative(training_inputs, target_array, hypothesis)
+
+    def test__Throws_if_target_is_not_numpy_array(self, RSS, training_inputs, hypothesis):
+        target_array = 'not an array'
+        with pytest.raises(TypeError):
+            RSS.getDerivative(training_inputs, target_array, hypothesis)
+
+    def test__Throws_if_target_is_length_zero(self, RSS, training_inputs, hypothesis):
+        target_array = np.array([])
+        print(f'm = {len(target_array)}')
+        with pytest.raises(ZeroDivisionError):
+            RSS.getDerivative(training_inputs, target_array, hypothesis)
+
+    def test__Throws_if_hypothesis_is_not_numpy_array(self, RSS, training_inputs, target_array):
+        hypothesis = 'not an array'
+        with pytest.raises(TypeError):
+            RSS.getDerivative(training_inputs, target_array, hypothesis)
 
 class Test__Class_TrainingInputs:
 
