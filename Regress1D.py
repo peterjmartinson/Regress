@@ -11,6 +11,7 @@ class Model:
         self.n     = None # Number of features
         self.theta = None # Parameter array
         self.a     = 0.1  # Learning rate
+        self.rss   = ResidualSumOfSquares()
 
     def setNumberOfTrainingExamples(self, numpy_array):
         self.m = len(numpy_array)
@@ -60,42 +61,15 @@ class Model:
         h = self.theta.getCoefficients()[0]*1 + np.sum(self.theta.getCoefficients()[1:] * self.X.getTrainingInputs(), axis=1)
         return h
 
-    # J(theta_0, theta_1) = 1/2m sum_i=1^m [ (H(xi)-yi)^2 ]
-    def getJ(self):
-        h = self.getHypothesis()
-        y = self.y
-        m = self.m
-        J = 0
-        for i in range(len(y)):
-            J = J + ( (h[i] - y[i])*(h[i] - y[i]) )
-        J = J * 1/(2 * m)
-        print("J = ", J)
-        return J
-
-    ## Note: the following is *only* valid for one-dimensional hypotheses,
-    ## i.e. those with only two coefficients
-    def getDerivativeOfJ(self):
-        if self.X is None:
-            raise ValueError('X contains no data!')
-        if self.y is None:
-            raise ValueError('y contains no data!')
-        if self.m is None:
-            raise ValueError('m contains no data!')
-        if self.m == 0:
-            raise ValueError('m is zero!  Division by Zero!')
-        dJ = np.array([
-            (1/self.m) * np.sum( (self.getHypothesis() - self.y) ),
-            (1/self.m) * np.sum( (self.getHypothesis() - self.y) * self.X.getTrainingInputs().T)
-        ])
-        return dJ
-
     # theta_j := theta_j - alpha - [d/dtheta_j]J(theta_0, theta_1), for j = 0, 1
     def evaluateNewThetas(self):
         if self.theta is None:
             raise ValueError('theta contains no data!')
         if self.a is None:
             raise ValueError('a contains no data!')
-        temp_theta = self.theta.getCoefficients() - self.a - self.getDerivativeOfJ()
+        dJ = self.rss.getDerivative(self.X.getTrainingInputs(), self.y, self.getHypothesis())
+        # temp_theta = self.theta.getCoefficients() - self.a - self.getDerivativeOfJ()
+        temp_theta = self.theta.getCoefficients() - self.a - dJ
         for i in range(len(temp_theta)):
             self.theta.updateCoefficient(i, temp_theta[i])
 
