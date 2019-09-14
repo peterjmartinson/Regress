@@ -180,7 +180,7 @@ class Test_getDerivativeOfJ:
         model.setFeatures(training_inputs)
         model.setTargets(target_array)
         print(f'X:  {model.X.getTrainingInputs()}')
-        print(f'theta:  {model.theta}')
+        print(f'theta:  {model.theta.getCoefficients()}')
         print(f'self.m:  {model.m}')
         print(f'self.getHypothesis():  {model.getHypothesis()}')
         print(f'self.y:  {model.y}')
@@ -278,14 +278,45 @@ class Test__Class_ResidualSumOfSquares:
         assert hasattr(RSS, 'getValue')
 
     def test__getValue_returns_a_float(self, RSS, model, training_inputs, target_array, hypothesis):
-        J = RSS.getValue(hypothesis, target_array)
+        J = RSS.getValue(target_array, hypothesis)
         assert isinstance(J, float)
 
     def test__getValue_returns_correct_J(self, RSS, model, training_inputs, target_array, hypothesis):
         correct_J = 6.082499999999999
-        J = RSS.getValue(hypothesis, target_array)
+        J = RSS.getValue(target_array, hypothesis)
         assert J == correct_J
 
+    def test_getDerivative_returns_an_appropriate_derivative(self, RSS, training_inputs, target_array, hypothesis):
+        correct_dJ = [-2.85, -21.45]
+        print(f'X:  {training_inputs}')
+        print(f'self.m:  {len(target_array)}')
+        print(f'hypothesis:  {hypothesis}')
+        print(f'y:  {target_array}')
+        result_dJ = RSS.getDerivative(training_inputs, target_array, hypothesis)
+        print(f'derivative of J:  {result_dJ}')
+        print(f'expected dJ: {correct_dJ}')
+        npt.assert_array_equal(result_dJ, correct_dJ)
+
+    def test__Throws_if_input_is_not_numpy_array(self, RSS, target_array, hypothesis):
+        training_inputs = 'not an array'
+        with pytest.raises(TypeError):
+            RSS.getDerivative(training_inputs, target_array, hypothesis)
+
+    def test__Throws_if_target_is_not_numpy_array(self, RSS, training_inputs, hypothesis):
+        target_array = 'not an array'
+        with pytest.raises(TypeError):
+            RSS.getDerivative(training_inputs, target_array, hypothesis)
+
+    def test__Throws_if_target_is_length_zero(self, RSS, training_inputs, hypothesis):
+        target_array = np.array([])
+        print(f'm = {len(target_array)}')
+        with pytest.raises(ZeroDivisionError):
+            RSS.getDerivative(training_inputs, target_array, hypothesis)
+
+    def test__Throws_if_hypothesis_is_not_numpy_array(self, RSS, training_inputs, target_array):
+        hypothesis = 'not an array'
+        with pytest.raises(TypeError):
+            RSS.getDerivative(training_inputs, target_array, hypothesis)
 
 class Test__Class_TrainingInputs:
 
