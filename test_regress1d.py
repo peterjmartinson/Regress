@@ -147,67 +147,6 @@ class Test_setTargets:
         model.setTargets(target_array)
         npt.assert_array_equal(model.y, target_array)
 
-class Test_getDerivativeOfJ:
-
-    def test__Exists(self, model):
-        assert hasattr(model, 'getDerivativeOfJ')
-
-    def test__Throws_If_X_Is_None(self, model):
-        with pytest.raises(ValueError):
-            model.getDerivativeOfJ()
-
-    def test__Throws_If_y_Is_None(self, model, training_inputs):
-        model.setFeatures(training_inputs)
-        with pytest.raises(ValueError):
-            model.getDerivativeOfJ()
-
-    def test__Throws_if_m_is_None(self, model, training_inputs, target_array):
-        model.setFeatures(training_inputs)
-        model.setTargets(target_array)
-        model.m = None
-        with pytest.raises(ValueError):
-            model.getDerivativeOfJ()
-
-    def test__Throws_if_m_is_zero(self, model, training_inputs, target_array):
-        model.setFeatures(training_inputs)
-        model.setTargets(target_array)
-        model.m = 0
-        with pytest.raises(ValueError):
-            model.getDerivativeOfJ()
-
-    def test_Returns_an_appropriate_derivative(self, model, training_inputs, target_array):
-        correct_dJ = [-2.85, -21.45]
-        model.setFeatures(training_inputs)
-        model.setTargets(target_array)
-        print(f'X:  {model.X.getTrainingInputs()}')
-        print(f'theta:  {model.theta.getCoefficients()}')
-        print(f'self.m:  {model.m}')
-        print(f'self.getHypothesis():  {model.getHypothesis()}')
-        print(f'self.y:  {model.y}')
-        print(f'derivative of J:  {model.getDerivativeOfJ()}')
-        result_dJ = model.getDerivativeOfJ()
-        npt.assert_array_equal(result_dJ, correct_dJ)
-
-    def test__Changes_value_of_theta_0(self, model, training_inputs, target_array):
-        model.setFeatures(training_inputs)
-        model.setTargets(target_array)
-        initial_theta_0 = model.theta.getCoefficients()[0]
-        print("initial theta 0 = ", initial_theta_0)
-        model.evaluateNewThetas()
-        print("final theta 0 = ", model.theta.getCoefficients()[0])
-        assert initial_theta_0 != model.theta.getCoefficients()[0]
-
-    def test__Changes_all_theta_values(self, model, training_inputs, target_array):
-        model.setFeatures(training_inputs)
-        model.setTargets(target_array)
-        d = np.ones(len(model.theta.getCoefficients()))
-        model.evaluateNewThetas()
-        d -= model.theta.getCoefficients()
-        print("final theta = ", model.theta.getCoefficients())
-        print("d = ", d)
-        assert d.sum() != 0.0
-
-
 class Test__evaluateNewThetas:
 
     def test__Exists(self, model):
@@ -227,28 +166,24 @@ class Test__evaluateNewThetas:
         with pytest.raises(ValueError):
             model.evaluateNewThetas()
 
-class Test__getJ:
-
-    def test__Exists(self, model):
-        assert hasattr(model, 'getJ')
-
-    def test__Returns_a_float(self, model, training_inputs, target_array):
+    def test__Changes_value_of_theta_0(self, model, training_inputs, target_array):
         model.setFeatures(training_inputs)
         model.setTargets(target_array)
-        J = model.getJ()
-        assert isinstance(J, float)
+        initial_theta_0 = model.theta.getCoefficients()[0]
+        print("initial theta 0 = ", initial_theta_0)
+        model.evaluateNewThetas()
+        print("final theta 0 = ", model.theta.getCoefficients()[0])
+        assert initial_theta_0 != model.theta.getCoefficients()[0]
 
-    def test__Returns_correct_J(self, model, training_inputs, target_array):
+    def test__Changes_all_theta_values(self, model, training_inputs, target_array):
         model.setFeatures(training_inputs)
         model.setTargets(target_array)
-        correct_J = 6.082499999999999
-        J = model.getJ()
-        assert J == correct_J
-
-
-
-
-
+        d = np.ones(len(model.theta.getCoefficients()))
+        model.evaluateNewThetas()
+        d -= model.theta.getCoefficients()
+        print("final theta = ", model.theta.getCoefficients())
+        print("d = ", d)
+        assert d.sum() != 0.0
 
 class Test__getHypothesis:
 
