@@ -13,14 +13,6 @@ class Model:
         self.a     = 0.1  # Learning rate
         self.rss   = ResidualSumOfSquares()
 
-    def setNumberOfTrainingExamples(self, numpy_array):
-        self.m = len(numpy_array)
-
-    def incrementNumberOfFeatures(self):
-        if self.n is None:
-            self.n = 1
-        else:
-            self.n += 1
 
     def addAnotherTheta(self):
         if self.theta is None:
@@ -43,8 +35,6 @@ class Model:
         self.m = self.X.getNumberOfTrainingExamples()
         self.addAnotherTheta()
 
-    def getFeatures(self):
-        return self.X
 
     def setTargets(self, numpy_array):
         if not isinstance(numpy_array, np.ndarray):
@@ -53,8 +43,6 @@ class Model:
             raise ValueError('input has wrong number of training values')
         self.y = numpy_array
 
-    def getTarget(self):
-        return self.y
 
     # H(xi) = theta_0 + theta_1 * xi
     def getHypothesis(self):
@@ -68,7 +56,6 @@ class Model:
         if self.a is None:
             raise ValueError('a contains no data!')
         dJ = self.rss.getDerivative(self.X.getTrainingInputs(), self.y, self.getHypothesis())
-        # temp_theta = self.theta.getCoefficients() - self.a - self.getDerivativeOfJ()
         temp_theta = self.theta.getCoefficients() - self.a - dJ
         for i in range(len(temp_theta)):
             self.theta.updateCoefficient(i, temp_theta[i])
