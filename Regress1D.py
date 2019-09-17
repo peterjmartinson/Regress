@@ -41,7 +41,7 @@ class Model:
             raise TypeError('input must be a Numpy array')
         if numpy_array.size != self.m:
             raise ValueError('input has wrong number of training values')
-        self.y = numpy_array
+        self.y = TrainingResponses(numpy_array)
 
 
     # H(xi) = theta_0 + theta_1 * xi
@@ -55,7 +55,7 @@ class Model:
             raise ValueError('theta contains no data!')
         if self.a is None:
             raise ValueError('a contains no data!')
-        dJ = self.rss.getDerivative(self.X.getTrainingPredictors(), self.y, self.getHypothesis())
+        dJ = self.rss.getDerivative(self.X.getTrainingPredictors(), self.y.getTrainingResponses(), self.getHypothesis())
         temp_theta = self.theta.getCoefficients() - self.a - dJ
         for i in range(len(temp_theta)):
             self.theta.updateCoefficient(i, temp_theta[i])

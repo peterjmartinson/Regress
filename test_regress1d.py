@@ -150,7 +150,7 @@ class Test_setTargets:
     def test__Sets_y(self, model, training_predictors, training_responses):
         model.setPredictors(training_predictors)
         model.setTargets(training_responses)
-        npt.assert_array_equal(model.y, training_responses)
+        npt.assert_array_equal(model.y.getTrainingResponses(), training_responses)
 
 class Test__evaluateNewThetas:
 
