@@ -15,9 +15,14 @@ def printDiagnostics(self):
 ## ======================================================= Pytest Fixtures
 
 @pytest.fixture
-def Inputs():
-    from Regress1D import TrainingInputs
-    return TrainingInputs(np.array([[1],[2],[3],[4],[5],[6],[7],[8],[9],[10]]))
+def Predictors():
+    from Regress1D import TrainingPredictors
+    return TrainingPredictors(np.array([[1],[2],[3],[4],[5],[6],[7],[8],[9],[10]]))
+
+@pytest.fixture
+def Responses():
+    from Regress1D import TrainingResponses
+    return TrainingResponses(np.array([1,2,3,4,5,6,7,8,9,10]) * 1.7)
 
 @pytest.fixture
 def Coefficients():
@@ -25,11 +30,11 @@ def Coefficients():
     return Coefficients(2)
 
 @pytest.fixture
-def training_inputs():
+def training_predictors():
     return np.array([[1],[2],[3],[4],[5],[6],[7],[8],[9],[10]])
 
 @pytest.fixture
-def added_training_example():
+def added_training_predictor():
     return np.array([3])
 
 @pytest.fixture
@@ -47,7 +52,7 @@ def numpy_array():
     return np.array([1., 2., 3.])
 
 @pytest.fixture
-def feature_array():
+def predictor_array():
     return np.array([1,2,3,4,5,6,7,8,9,10])
 
 @pytest.fixture
@@ -55,9 +60,9 @@ def sample_X():
     return np.array([[1,1,1,1,1,1,1,1,1,1], [1,2,3,4,5,6,7,8,9,10]])
 
 @pytest.fixture
-def target_array():
-    feature_array = np.array([1,2,3,4,5,6,7,8,9,10])
-    return feature_array * 1.7
+def training_responses():
+    predictor_array = np.array([1,2,3,4,5,6,7,8,9,10])
+    return predictor_array * 1.7
 
 @pytest.fixture
 def m():
@@ -76,54 +81,54 @@ class TestCanary:
 
 class Test_Model:
 
-    def test__Set_X_if_X_is_Empty(self, model, training_inputs):
-        correct_X = training_inputs
-        model.setFeatures(training_inputs)
+    def test__Set_X_if_X_is_Empty(self, model, training_predictors):
+        correct_X = training_predictors
+        model.setPredictors(training_predictors)
         print(f'correct_X:  {correct_X}')
-        print(f'training_inputs:  {training_inputs}')
-        print(f'model.X.training_inputs:  {model.X.training_inputs}')
-        npt.assert_array_equal(model.X.training_inputs, correct_X)
+        print(f'training_predictors:  {training_predictors}')
+        print(f'model.X.training_predictors:  {model.X.training_predictors}')
+        npt.assert_array_equal(model.X.training_predictors, correct_X)
 
-    def test__Append_Array_if_X_is_Set(self, model, Inputs, training_inputs, sample_X, added_training_example):
-        model.X = Inputs
-        model.m = model.X.getNumberOfTrainingExamples()
+    def test__Append_Array_if_X_is_Set(self, model, Predictors, training_predictors, sample_X, added_training_predictor):
+        model.X = Predictors
+        model.m = model.X.getNumberOfTrainingPredictors()
         model.n = model.X.getNumberOfFeatures()
-        correct_X = np.vstack((training_inputs, added_training_example))
-        model.setFeatures(added_training_example)
-        npt.assert_array_equal(model.X.training_inputs, correct_X)
+        correct_X = np.vstack((training_predictors, added_training_predictor))
+        model.setPredictors(added_training_predictor)
+        npt.assert_array_equal(model.X.training_predictors, correct_X)
 
-    def test__Increment_m_if_X_is_Set(self, model, training_inputs, added_training_example):
-        model.setFeatures(training_inputs)
-        model.setFeatures(added_training_example)
+    def test__Increment_m_if_X_is_Set(self, model, training_predictors, added_training_predictor):
+        model.setPredictors(training_predictors)
+        model.setPredictors(added_training_predictor)
         assert model.m == 11
 
-class Test_setFeatures:
+class Test_setPredictors:
 
     def test__Exists(self, model):
-        assert hasattr(model, 'setFeatures')
+        assert hasattr(model, 'setPredictors')
 
     def test__TakesNumpyArray(self, model):
         not_an_array = "not a Numpy ndarray"
         with pytest.raises(TypeError):
-            model.setFeatures(not_an_array)
+            model.setPredictors(not_an_array)
 
-    def test__Set_m_if_X_is_Empty(self, model, training_inputs, m):
-        model.setFeatures(training_inputs)
+    def test__Set_m_if_X_is_Empty(self, model, training_predictors, m):
+        model.setPredictors(training_predictors)
         assert m == model.m
 
-    def test__Throw_Exception_if_Array_is_Wrong_Size(self, model, training_inputs):
+    def test__Throw_Exception_if_Array_is_Wrong_Size(self, model, training_predictors):
         model.X = np.array([1.,1.,1.,1.])
         model.m = 4
         with pytest.raises(TypeError):
-            model.setFeatures(training_inputs)
+            model.setPredictors(training_predictors)
 
-    def test__Set_n_equal_to_1_if_X_is_Empty(self, model, training_inputs):
-        model.setFeatures(training_inputs)
+    def test__Set_n_equal_to_1_if_X_is_Empty(self, model, training_predictors):
+        model.setPredictors(training_predictors)
         assert model.n == 1
 
-    def test__Set_theta_if_theta_is_not_yet_set(self, model, training_inputs):
+    def test__Set_theta_if_theta_is_not_yet_set(self, model, training_predictors):
         correct_theta = np.array([1, 1])
-        model.setFeatures(training_inputs)
+        model.setPredictors(training_predictors)
         npt.assert_array_equal(model.theta.getCoefficients(), correct_theta)
 
 class Test_setTargets:
@@ -136,48 +141,48 @@ class Test_setTargets:
         with pytest.raises(TypeError):
             model.setTargets(not_an_array)
 
-    def test__Throws_if_y_has_not_m_elements(self, model, training_inputs, target_array):
-        bad_target_array = np.array([1, 2, 3])
-        model.setFeatures(training_inputs)
+    def test__Throws_if_y_has_not_m_elements(self, model, training_predictors, training_responses):
+        bad_training_responses = np.array([1, 2, 3])
+        model.setPredictors(training_predictors)
         with pytest.raises(ValueError):
-            model.setTargets(bad_target_array)
+            model.setTargets(bad_training_responses)
 
-    def test__Sets_y(self, model, training_inputs, target_array):
-        model.setFeatures(training_inputs)
-        model.setTargets(target_array)
-        npt.assert_array_equal(model.y, target_array)
+    def test__Sets_y(self, model, training_predictors, training_responses):
+        model.setPredictors(training_predictors)
+        model.setTargets(training_responses)
+        npt.assert_array_equal(model.y, training_responses)
 
 class Test__evaluateNewThetas:
 
     def test__Exists(self, model):
         assert hasattr(model, 'evaluateNewThetas')
 
-    def test__Throws_If_theta_Is_None(self, model, training_inputs, target_array):
-        model.setFeatures(training_inputs)
-        model.setTargets(target_array)
+    def test__Throws_If_theta_Is_None(self, model, training_predictors, training_responses):
+        model.setPredictors(training_predictors)
+        model.setTargets(training_responses)
         model.theta = None
         with pytest.raises(ValueError):
             model.evaluateNewThetas()
 
-    def test__Throws_If_a_Is_None(self, model, training_inputs, target_array):
-        model.setFeatures(training_inputs)
-        model.setTargets(target_array)
+    def test__Throws_If_a_Is_None(self, model, training_predictors, training_responses):
+        model.setPredictors(training_predictors)
+        model.setTargets(training_responses)
         model.a = None
         with pytest.raises(ValueError):
             model.evaluateNewThetas()
 
-    def test__Changes_value_of_theta_0(self, model, training_inputs, target_array):
-        model.setFeatures(training_inputs)
-        model.setTargets(target_array)
+    def test__Changes_value_of_theta_0(self, model, training_predictors, training_responses):
+        model.setPredictors(training_predictors)
+        model.setTargets(training_responses)
         initial_theta_0 = model.theta.getCoefficients()[0]
         print("initial theta 0 = ", initial_theta_0)
         model.evaluateNewThetas()
         print("final theta 0 = ", model.theta.getCoefficients()[0])
         assert initial_theta_0 != model.theta.getCoefficients()[0]
 
-    def test__Changes_all_theta_values(self, model, training_inputs, target_array):
-        model.setFeatures(training_inputs)
-        model.setTargets(target_array)
+    def test__Changes_all_theta_values(self, model, training_predictors, training_responses):
+        model.setPredictors(training_predictors)
+        model.setTargets(training_responses)
         d = np.ones(len(model.theta.getCoefficients()))
         model.evaluateNewThetas()
         d -= model.theta.getCoefficients()
@@ -190,15 +195,15 @@ class Test__getHypothesis:
     def test__Exists(self, model):
         assert hasattr(model, 'getHypothesis')
 
-    def test__Returns_numpy_array(self, model, training_inputs, target_array):
-        model.setFeatures(training_inputs)
-        model.setTargets(target_array)
+    def test__Returns_numpy_array(self, model, training_predictors, training_responses):
+        model.setPredictors(training_predictors)
+        model.setTargets(training_responses)
         H = model.getHypothesis()
         assert isinstance(H, np.ndarray)
 
-    def test__Resulting_hypothesis_is_1_by_m(self, model, training_inputs, target_array):
-        model.setFeatures(training_inputs)
-        model.setTargets(target_array)
+    def test__Resulting_hypothesis_is_1_by_m(self, model, training_predictors, training_responses):
+        model.setPredictors(training_predictors)
+        model.setTargets(training_responses)
         h = model.getHypothesis()
         m = model.m
         assert h.size == m
@@ -212,114 +217,147 @@ class Test__Class_ResidualSumOfSquares:
     def test__getValue_exists(self, RSS):
         assert hasattr(RSS, 'getValue')
 
-    def test__getValue_returns_a_float(self, RSS, model, training_inputs, target_array, hypothesis):
-        J = RSS.getValue(target_array, hypothesis)
+    def test__getValue_returns_a_float(self, RSS, model, training_predictors, training_responses, hypothesis):
+        J = RSS.getValue(training_responses, hypothesis)
         assert isinstance(J, float)
 
-    def test__getValue_returns_correct_J(self, RSS, model, training_inputs, target_array, hypothesis):
+    def test__getValue_returns_correct_J(self, RSS, model, training_predictors, training_responses, hypothesis):
         correct_J = 6.082499999999999
-        J = RSS.getValue(target_array, hypothesis)
+        J = RSS.getValue(training_responses, hypothesis)
         assert J == correct_J
 
-    def test_getDerivative_returns_an_appropriate_derivative(self, RSS, training_inputs, target_array, hypothesis):
+    def test_getDerivative_returns_an_appropriate_derivative(self, RSS, training_predictors, training_responses, hypothesis):
         correct_dJ = [-2.85, -21.45]
-        print(f'X:  {training_inputs}')
-        print(f'self.m:  {len(target_array)}')
+        print(f'X:  {training_predictors}')
+        print(f'self.m:  {len(training_responses)}')
         print(f'hypothesis:  {hypothesis}')
-        print(f'y:  {target_array}')
-        result_dJ = RSS.getDerivative(training_inputs, target_array, hypothesis)
+        print(f'y:  {training_responses}')
+        result_dJ = RSS.getDerivative(training_predictors, training_responses, hypothesis)
         print(f'derivative of J:  {result_dJ}')
         print(f'expected dJ: {correct_dJ}')
         npt.assert_array_equal(result_dJ, correct_dJ)
 
-    def test__Throws_if_input_is_not_numpy_array(self, RSS, target_array, hypothesis):
-        training_inputs = 'not an array'
+    def test__Throws_if_predictor_is_not_numpy_array(self, RSS, training_responses, hypothesis):
+        training_predictors = 'not an array'
         with pytest.raises(TypeError):
-            RSS.getDerivative(training_inputs, target_array, hypothesis)
+            RSS.getDerivative(training_predictors, training_responses, hypothesis)
 
-    def test__Throws_if_target_is_not_numpy_array(self, RSS, training_inputs, hypothesis):
-        target_array = 'not an array'
+    def test__Throws_if_target_is_not_numpy_array(self, RSS, training_predictors, hypothesis):
+        training_responses = 'not an array'
         with pytest.raises(TypeError):
-            RSS.getDerivative(training_inputs, target_array, hypothesis)
+            RSS.getDerivative(training_predictors, training_responses, hypothesis)
 
-    def test__Throws_if_target_is_length_zero(self, RSS, training_inputs, hypothesis):
-        target_array = np.array([])
-        print(f'm = {len(target_array)}')
+    def test__Throws_if_target_is_length_zero(self, RSS, training_predictors, hypothesis):
+        training_responses = np.array([])
+        print(f'm = {len(training_responses)}')
         with pytest.raises(ZeroDivisionError):
-            RSS.getDerivative(training_inputs, target_array, hypothesis)
+            RSS.getDerivative(training_predictors, training_responses, hypothesis)
 
-    def test__Throws_if_hypothesis_is_not_numpy_array(self, RSS, training_inputs, target_array):
+    def test__Throws_if_hypothesis_is_not_numpy_array(self, RSS, training_predictors, training_responses):
         hypothesis = 'not an array'
         with pytest.raises(TypeError):
-            RSS.getDerivative(training_inputs, target_array, hypothesis)
+            RSS.getDerivative(training_predictors, training_responses, hypothesis)
 
-class Test__Class_TrainingInputs:
+class Test__Class_TrainingPredictors:
 
     def test__Initializing_takes_numpy_array(self):
-        from Regress1D import TrainingInputs
+        from Regress1D import TrainingPredictors
         not_an_array = "not a Numpy ndarray"
         with pytest.raises(TypeError):
-            Inputs = TrainingInputs(not_an_array)
+            Predictors = TrainingPredictors(not_an_array)
 
-    def test__Initializing_sets_training_inputs(self, training_inputs):
-        correct_training_set = training_inputs
-        from Regress1D import TrainingInputs
-        Inputs = TrainingInputs(training_inputs)
-        npt.assert_array_equal(Inputs.training_inputs, correct_training_set)
+    def test__Initializing_sets_training_predictors(self, training_predictors):
+        correct_training_set = training_predictors
+        from Regress1D import TrainingPredictors
+        Predictors = TrainingPredictors(training_predictors)
+        npt.assert_array_equal(Predictors.training_predictors, correct_training_set)
 
-    def test__Initializing_sets_number_of_features(self, training_inputs):
+    def test__Initializing_sets_number_of_features(self, training_predictors):
         correct_n = 1
-        from Regress1D import TrainingInputs
-        Inputs = TrainingInputs(training_inputs)
-        assert Inputs.number_of_features == correct_n
+        from Regress1D import TrainingPredictors
+        Predictors = TrainingPredictors(training_predictors)
+        assert Predictors.number_of_features == correct_n
 
-    def test__Initializing_sets_number_of_training_examples(self, training_inputs):
+    def test__Initializing_sets_number_of_training_predictors(self, training_predictors):
         correct_m = 10
-        from Regress1D import TrainingInputs
-        Inputs = TrainingInputs(training_inputs)
-        assert Inputs.number_of_training_examples == correct_m
+        from Regress1D import TrainingPredictors
+        Predictors = TrainingPredictors(training_predictors)
+        assert Predictors.number_of_training_predictors == correct_m
 
-    def test__getTrainingInputs_gets_the_right_inputs(self, Inputs, training_inputs):
-        gotten_inputs = Inputs.getTrainingInputs()
-        npt.assert_array_equal(gotten_inputs, training_inputs)
+    def test__getTrainingPredictors_gets_the_right_predictors(self, Predictors, training_predictors):
+        gotten_predictors = Predictors.getTrainingPredictors()
+        npt.assert_array_equal(gotten_predictors, training_predictors)
 
-    def test__getNumberOfTrainingExamples_gets_the_right_number(self, Inputs, m):
-        gotten_number = Inputs.getNumberOfTrainingExamples()
+    def test__getNumberOfTrainingPredictors_gets_the_right_number(self, Predictors, m):
+        gotten_number = Predictors.getNumberOfTrainingPredictors()
         assert gotten_number == m
 
-    def test__getNumberOfFeatures_gets_the_right_number(self, Inputs):
+    def test__getNumberOfFeatures_gets_the_right_number(self, Predictors):
         correct_n = 1
-        gotten_number = Inputs.getNumberOfFeatures()
+        gotten_number = Predictors.getNumberOfFeatures()
         assert gotten_number == correct_n
 
-    def test__addTrainingExample_takes_a_numpy_array(self, Inputs):
+    def test__addTrainingPredictor_takes_a_numpy_array(self, Predictors):
         not_an_array = "not a Numpy arry"
         with pytest.raises(TypeError):
-            new_inputs = Inputs.addTrainingExample(not_an_array)
+            new_predictors = Predictors.addTrainingPredictor(not_an_array)
 
-    def test__addTrainingExample_throws_if_array_is_wrong_size(self, Inputs):
+    def test__addTrainingPredictor_throws_if_array_is_wrong_size(self, Predictors):
         wrong_array = np.array([1,2,3])
         with pytest.raises(ValueError):
-            new_inputs = Inputs.addTrainingExample(wrong_array)
+            new_predictors = Predictors.addTrainingPredictor(wrong_array)
 
-    def test__addTrainingExample_adds_correct_training_example(self, Inputs, training_inputs):
-        initial_array = training_inputs
-        added_training_example = np.array([3])
-        correct_array = np.vstack((initial_array, added_training_example))
-        Inputs.addTrainingExample(added_training_example)
-        npt.assert_array_equal(correct_array, Inputs.training_inputs)
+    def test__addTrainingPredictor_adds_correct_training_predictor(self, Predictors, training_predictors):
+        initial_array = training_predictors
+        added_training_predictor = np.array([3])
+        correct_array = np.vstack((initial_array, added_training_predictor))
+        Predictors.addTrainingPredictor(added_training_predictor)
+        npt.assert_array_equal(correct_array, Predictors.training_predictors)
 
-    def test__addTrainingExample_increments_number_of_training_examples(self, Inputs):
-        added_training_example = np.array([3])
-        correct_number_of_training_examples = 11
-        Inputs.addTrainingExample(added_training_example)
-        assert Inputs.number_of_training_examples == correct_number_of_training_examples
+    def test__addTrainingPredictor_increments_number_of_training_predictors(self, Predictors):
+        added_training_predictor = np.array([3])
+        correct_number_of_training_predictors = 11
+        Predictors.addTrainingPredictor(added_training_predictor)
+        assert Predictors.number_of_training_predictors == correct_number_of_training_predictors
         
 
-## Your feature_array is the wrong shape
-## instead of (1,10), it should be (10,1)!!
-## if there is only one feature, array should be [[1],[2],[3],...]
-## if there are two or more features, should be [[1,1],[2,2],[3,3],...]
+class Test__Class_TrainingResponses:
+
+    def test__Initializing_takes_numpy_array(self):
+        from Regress1D import TrainingResponses
+        not_an_array = "not a Numpy ndarray"
+        with pytest.raises(TypeError):
+            Predictors = TrainingResponses(not_an_array)
+
+    def test__Initializing_sets_training_responses(self, training_responses):
+        correct_training_set = training_responses
+        from Regress1D import TrainingResponses
+        Responses = TrainingResponses(training_responses)
+        npt.assert_array_equal(Responses.training_responses, correct_training_set)
+
+    def test__getTrainingResponses_gets_the_right_responses(self, Responses, training_responses):
+        gotten_responses = Responses.getTrainingResponses()
+        npt.assert_array_equal(gotten_responses, training_responses)
+
+    def test__addTrainingResponse_takes_a_numpy_array(self, Responses):
+        not_an_array = "not a Numpy arry"
+        with pytest.raises(TypeError):
+            new_responses = Responses.addTrainingResponse(not_an_array)
+
+    def test__addTrainingResponse_adds_correct_training_response(self, Responses, training_responses):
+        initial_array = training_responses
+        added_training_response = np.array([3])
+        correct_array = np.append(initial_array, added_training_response)
+        Responses.addTrainingResponse(added_training_response)
+        npt.assert_array_equal(correct_array, Responses.training_responses)
+
+    def test__addTrainingResponse_adds_correct_training_response(self, Responses, training_responses):
+        initial_array = training_responses
+        added_training_response = np.array([3])
+        correct_array = np.append(initial_array, added_training_response)
+        returned_array = Responses.addTrainingResponse(added_training_response)
+        npt.assert_array_equal(correct_array, returned_array)
+
 
 
 class Test_Class_Coefficients:
