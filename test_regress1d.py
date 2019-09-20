@@ -8,8 +8,8 @@ def printDiagnostics(self):
     print("y (Target array):                ", self.y)
     print("m (Number of training examples): ", self.m)
     print("n (Number of features):          ", self.n)
-    print("theta (Parameter array):         ", self.theta)
-    print("dJ (container for all current dJ/dTheta values): ", self.dJ)
+    print("beta (Parameter array):         ", self.beta)
+    print("dJ (container for all current dJ/dBeta values): ", self.dJ)
     print("a (Learning rate):               ", self.a)
 
 ## ======================================================= Pytest Fixtures
@@ -126,10 +126,10 @@ class Test_setPredictors:
         model.setPredictors(training_predictors)
         assert model.n == 1
 
-    def test__Set_theta_if_theta_is_not_yet_set(self, model, training_predictors):
-        correct_theta = np.array([1, 1])
+    def test__Set_beta_if_beta_is_not_yet_set(self, model, training_predictors):
+        correct_beta = np.array([1, 1])
         model.setPredictors(training_predictors)
-        npt.assert_array_equal(model.theta.getCoefficients(), correct_theta)
+        npt.assert_array_equal(model.beta.getCoefficients(), correct_beta)
 
 class Test_setTargets:
 
@@ -152,41 +152,41 @@ class Test_setTargets:
         model.setTargets(training_responses)
         npt.assert_array_equal(model.y.getTrainingResponses(), training_responses)
 
-class Test__evaluateNewThetas:
+class Test__evaluateNewBetas:
 
     def test__Exists(self, model):
-        assert hasattr(model, 'evaluateNewThetas')
+        assert hasattr(model, 'evaluateNewBetas')
 
-    def test__Throws_If_theta_Is_None(self, model, training_predictors, training_responses):
+    def test__Throws_If_beta_Is_None(self, model, training_predictors, training_responses):
         model.setPredictors(training_predictors)
         model.setTargets(training_responses)
-        model.theta = None
+        model.beta = None
         with pytest.raises(ValueError):
-            model.evaluateNewThetas()
+            model.evaluateNewBetas()
 
     def test__Throws_If_a_Is_None(self, model, training_predictors, training_responses):
         model.setPredictors(training_predictors)
         model.setTargets(training_responses)
         model.a = None
         with pytest.raises(ValueError):
-            model.evaluateNewThetas()
+            model.evaluateNewBetas()
 
-    def test__Changes_value_of_theta_0(self, model, training_predictors, training_responses):
+    def test__Changes_value_of_beta_0(self, model, training_predictors, training_responses):
         model.setPredictors(training_predictors)
         model.setTargets(training_responses)
-        initial_theta_0 = model.theta.getCoefficients()[0]
-        print("initial theta 0 = ", initial_theta_0)
-        model.evaluateNewThetas()
-        print("final theta 0 = ", model.theta.getCoefficients()[0])
-        assert initial_theta_0 != model.theta.getCoefficients()[0]
+        initial_beta_0 = model.beta.getCoefficients()[0]
+        print("initial beta 0 = ", initial_beta_0)
+        model.evaluateNewBetas()
+        print("final beta 0 = ", model.beta.getCoefficients()[0])
+        assert initial_beta_0 != model.beta.getCoefficients()[0]
 
-    def test__Changes_all_theta_values(self, model, training_predictors, training_responses):
+    def test__Changes_all_beta_values(self, model, training_predictors, training_responses):
         model.setPredictors(training_predictors)
         model.setTargets(training_responses)
-        d = np.ones(len(model.theta.getCoefficients()))
-        model.evaluateNewThetas()
-        d -= model.theta.getCoefficients()
-        print("final theta = ", model.theta.getCoefficients())
+        d = np.ones(len(model.beta.getCoefficients()))
+        model.evaluateNewBetas()
+        d -= model.beta.getCoefficients()
+        print("final beta = ", model.beta.getCoefficients())
         print("d = ", d)
         assert d.sum() != 0.0
 
@@ -416,8 +416,6 @@ class Test_Class_Coefficients:
         correct_output = np.array([1., 2., 1.])
         output = Coefficients.updateCoefficient(1, replacement_element)
         npt.assert_array_equal(output, correct_output)
-
-
 
 
 

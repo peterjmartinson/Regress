@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 
+
 class Model:
     """Provides a linear regression model"""
     
@@ -9,16 +10,15 @@ class Model:
         self.y     = None # Target array
         self.m     = None # Number of training examples
         self.n     = None # Number of features
-        self.theta = None # Parameter array
-        self.a     = 0.1  # Learning rate
+        self.beta  = None # Parameter array
+        self.a     = 0.01  # Learning rate
         self.rss   = ResidualSumOfSquares()
 
-
-    def addAnotherTheta(self):
-        if self.theta is None:
-            self.theta = Coefficients(self.X.getNumberOfFeatures())
+    def addAnotherBeta(self):
+        if self.beta is None:
+            self.beta = Coefficients(self.X.getNumberOfFeatures())
         else:
-            self.theta = self.theta.addCoefficient()
+            self.beta = self.beta.addCoefficient()
 
     def setPredictors(self, numpy_array):
         if not isinstance(numpy_array, np.ndarray):
@@ -33,8 +33,7 @@ class Model:
             else:
                 raise TypeError('input array is not the right size')
         self.m = self.X.getNumberOfTrainingPredictors()
-        self.addAnotherTheta()
-
+        self.addAnotherBeta()
 
     def setTargets(self, numpy_array):
         if not isinstance(numpy_array, np.ndarray):
@@ -43,22 +42,21 @@ class Model:
             raise ValueError('input has wrong number of training values')
         self.y = TrainingResponses(numpy_array)
 
-
-    # H(xi) = theta_0 + theta_1 * xi
+    # H(xi) = beta_0 + beta_1 * xi
     def getHypothesis(self):
-        h = self.theta.getCoefficients()[0]*1 + np.sum(self.theta.getCoefficients()[1:] * self.X.getTrainingPredictors(), axis=1)
+        h = self.beta.getCoefficients()[0]*1 + np.sum(self.beta.getCoefficients()[1:] * self.X.getTrainingPredictors(), axis=1)
         return h
 
-    # theta_j := theta_j - alpha - [d/dtheta_j]J(theta_0, theta_1), for j = 0, 1
-    def evaluateNewThetas(self):
-        if self.theta is None:
-            raise ValueError('theta contains no data!')
+    # beta_j := beta_j - alpha - [d/dbeta_j]J(beta_0, beta_1), for j = 0, 1
+    def evaluateNewBetas(self):
+        if self.beta is None:
+            raise ValueError('beta contains no data!')
         if self.a is None:
             raise ValueError('a contains no data!')
         dJ = self.rss.getDerivative(self.X.getTrainingPredictors(), self.y.getTrainingResponses(), self.getHypothesis())
-        temp_theta = self.theta.getCoefficients() - self.a - dJ
-        for i in range(len(temp_theta)):
-            self.theta.updateCoefficient(i, temp_theta[i])
+        temp_beta = self.beta.getCoefficients() - self.a - dJ
+        for i in range(len(temp_beta)):
+            self.beta.updateCoefficient(i, temp_beta[i])
 
 class ResidualSumOfSquares:
     """This is what Ng calls the 'Cost Function', or J"""
@@ -149,7 +147,7 @@ class TrainingResponses:
         return self.training_responses
 
 class Coefficients:
-    """This is what Ng calls Theta.  The coefficients of the Hypothesis."""
+    """This is what Ng calls Theta, and ISL calls Beta.  The coefficients of the Hypothesis."""
 
     c = None
 
@@ -174,8 +172,58 @@ class Coefficients:
         return self.c
 
 
-# class Hypothesis:
-#     """This is the result of running the model"""
 
-# class Model:
-#     """This is the glue"""
+
+
+
+
+
+
+### ===============  Test this thing out!
+### ===============  Currently, the model wildly diverges.  Either there's something wrong with the model, or something wrong with the initial Coefficient guesses
+### ===============  The "answer" should ideally be y = 1.7 * x, or beta = [0, 1.7]
+
+
+
+model = Model()
+training_predictors = np.array([[1],[2],[3],[4],[5],[6],[7],[8],[9],[10]])
+training_responses = np.array([1,2,3,4,5,6,7,8,9,10]) * 1.7
+model.setPredictors(training_predictors)
+model.setTargets(training_responses)
+
+print(f'X:  {model.X.getTrainingPredictors()}')
+print(f'y:  {model.y.getTrainingResponses()}')
+print(f'm:  {model.m}')
+print(f'n:  {model.n}')
+print(f'beta:  {model.beta.getCoefficients()}')
+
+model.evaluateNewBetas()
+print(f'beta:  {model.beta.getCoefficients()}')
+model.evaluateNewBetas()
+print(f'beta:  {model.beta.getCoefficients()}')
+model.evaluateNewBetas()
+print(f'beta:  {model.beta.getCoefficients()}')
+model.evaluateNewBetas()
+print(f'beta:  {model.beta.getCoefficients()}')
+model.evaluateNewBetas()
+print(f'beta:  {model.beta.getCoefficients()}')
+model.evaluateNewBetas()
+print(f'beta:  {model.beta.getCoefficients()}')
+model.evaluateNewBetas()
+print(f'beta:  {model.beta.getCoefficients()}')
+model.evaluateNewBetas()
+print(f'beta:  {model.beta.getCoefficients()}')
+model.evaluateNewBetas()
+print(f'beta:  {model.beta.getCoefficients()}')
+model.evaluateNewBetas()
+print(f'beta:  {model.beta.getCoefficients()}')
+model.evaluateNewBetas()
+print(f'beta:  {model.beta.getCoefficients()}')
+model.evaluateNewBetas()
+print(f'beta:  {model.beta.getCoefficients()}')
+model.evaluateNewBetas()
+print(f'beta:  {model.beta.getCoefficients()}')
+
+print("--------------------")
+
+## Note, beta_0 = 0, beta_1 = 1.7
