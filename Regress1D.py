@@ -20,19 +20,19 @@ class Model:
         else:
             self.theta = self.theta.addCoefficient()
 
-    def setFeatures(self, numpy_array):
+    def setPredictors(self, numpy_array):
         if not isinstance(numpy_array, np.ndarray):
             raise TypeError('input must be a Numpy array')
         if self.X is None:
-            self.X = TrainingInputs(numpy_array)
-            self.m = self.X.getNumberOfTrainingExamples()
+            self.X = TrainingPredictors(numpy_array)
+            self.m = self.X.getNumberOfTrainingPredictors()
             self.n = self.X.getNumberOfFeatures()
         else:
             if len(numpy_array) == self.n:
-                self.X.addTrainingExample(numpy_array)
+                self.X.addTrainingPredictor(numpy_array)
             else:
                 raise TypeError('input array is not the right size')
-        self.m = self.X.getNumberOfTrainingExamples()
+        self.m = self.X.getNumberOfTrainingPredictors()
         self.addAnotherTheta()
 
 
@@ -41,12 +41,12 @@ class Model:
             raise TypeError('input must be a Numpy array')
         if numpy_array.size != self.m:
             raise ValueError('input has wrong number of training values')
-        self.y = numpy_array
+        self.y = TrainingResponses(numpy_array)
 
 
     # H(xi) = theta_0 + theta_1 * xi
     def getHypothesis(self):
-        h = self.theta.getCoefficients()[0]*1 + np.sum(self.theta.getCoefficients()[1:] * self.X.getTrainingInputs(), axis=1)
+        h = self.theta.getCoefficients()[0]*1 + np.sum(self.theta.getCoefficients()[1:] * self.X.getTrainingPredictors(), axis=1)
         return h
 
     # theta_j := theta_j - alpha - [d/dtheta_j]J(theta_0, theta_1), for j = 0, 1
@@ -55,7 +55,7 @@ class Model:
             raise ValueError('theta contains no data!')
         if self.a is None:
             raise ValueError('a contains no data!')
-        dJ = self.rss.getDerivative(self.X.getTrainingInputs(), self.y, self.getHypothesis())
+        dJ = self.rss.getDerivative(self.X.getTrainingPredictors(), self.y.getTrainingResponses(), self.getHypothesis())
         temp_theta = self.theta.getCoefficients() - self.a - dJ
         for i in range(len(temp_theta)):
             self.theta.updateCoefficient(i, temp_theta[i])
@@ -96,61 +96,57 @@ class ResidualSumOfSquares:
         ])
         return dJ
 
-class TrainingInputs:
+class TrainingPredictors:
     """This is the array of training inputs"""
 
-    training_inputs = None
+    training_predictors = None
     number_of_features = 0
-    number_of_training_examples = None
-
-    # def setFeatures(self, numpy_array):
-    #     if not isinstance(numpy_array, np.ndarray):
-    #         raise TypeError('input must be a Numpy array')
-    #     if self.X is None:
-    #         self.setNumberOfTrainingExamples(numpy_array)
-    #         self.X = np.vstack((np.ones((1, self.m)), numpy_array))
-    #     else:
-    #         if len(numpy_array) == self.m:
-    #             self.X = np.vstack((self.X, numpy_array))
-    #         else:
-    #             raise TypeError('input array is not the right size')
-    #     self.incrementNumberOfFeatures()
-    #     self.addAnotherTheta()
-    # Should retain information about number of features (n)
-    # Should retain information about number of training examples (m)
-    # Should allow adding training examples
-    # Should *not* initialize the coefficients.  The Model class does this
-    # should only know about the training inputs
-    # set, get, add
-    # Make "Hypothesis" do the work of prepending the x_0 = 1 term
+    number_of_training_predictors = None
 
     def __init__(self, numpy_array):
         if not isinstance(numpy_array, np.ndarray):
             raise TypeError('input must be a Numpy array')
-        self.number_of_training_examples = len(numpy_array)
-        self.training_inputs = numpy_array
+        self.number_of_training_predictors = len(numpy_array)
+        self.training_predictors = numpy_array
         self.number_of_features += 1
 
-    def getTrainingInputs(self):
-        return self.training_inputs
+    def getTrainingPredictors(self):
+        return self.training_predictors
 
-    def getNumberOfTrainingExamples(self):
-        return self.number_of_training_examples
+    def getNumberOfTrainingPredictors(self):
+        return self.number_of_training_predictors
 
     def getNumberOfFeatures(self):
         return self.number_of_features
 
-    def addTrainingExample(self, numpy_array):
+    def addTrainingPredictor(self, numpy_array):
         if not isinstance(numpy_array, np.ndarray):
             raise TypeError('input must be a Numpy array')
         if len(numpy_array) != self.number_of_features:
             raise ValueError(f'input must be of size {self.number_of_features}!')
-        self.training_inputs = np.vstack((self.training_inputs, numpy_array))
-        self.number_of_training_examples += 1
-        return self.training_inputs
+        self.training_predictors = np.vstack((self.training_predictors, numpy_array))
+        self.number_of_training_predictors += 1
+        return self.training_predictors
 
     
-# class TrainingTargets:
+class TrainingResponses:
+    """This is the array of 'y-values'"""
+
+    training_responses = None
+
+    def __init__(self, numpy_array):
+        if not isinstance(numpy_array, np.ndarray):
+            raise TypeError('input must be a Numpy array')
+        self.training_responses = numpy_array
+
+    def getTrainingResponses(self):
+        return self.training_responses
+
+    def addTrainingResponse(self, added_training_response):
+        if not isinstance(added_training_response, np.ndarray):
+            raise TypeError('input must be a Numpy array')
+        self.training_responses = np.append(self.training_responses, added_training_response)
+        return self.training_responses
 
 class Coefficients:
     """This is what Ng calls Theta.  The coefficients of the Hypothesis."""
